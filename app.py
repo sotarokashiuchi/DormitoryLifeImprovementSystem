@@ -20,15 +20,7 @@ def index():
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
 
-  cookie_sessid = request.cookies.get("SESSID")
-
-  # SQL操作[セッションIDの検索]
-  conn = sqlite3.connect("./static/database/kakaria.db")
-  cur = conn.cursor()
-  cur.execute("SELECT * FROM session WHERE session_id == ?", (cookie_sessid, ))
-  fetch_session = cur.fetchone()
-  cur.close()
-  conn.close()
+  fetch_session = authentication_session()
 
   if fetch_session == None:
     # セッション認証非完了
@@ -122,10 +114,40 @@ def sinup():
       # 新規会員登録完了
       return redirect(url_for('sinup_complete'))
 
-@app.route('/change_password')
+@app.route('/change_password', methods=["POST", "GET"])
 def change_password():
-  response = make_response(render_template("./change_password.html"))
-  return response
+  if request.method == "GET":
+    # GET
+    response = make_response(render_template("./change_password.html", condition=0))
+    return response
+  else:
+    # POST
+    user_name = request.form["user_name"]
+    old_password = request.form["old_password"]
+    new_password = request.form["new_password"]
+
+    # SQL操作
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM user WHERE user_name == ? AND password == ?", (user_name, password_hash(str(old_password))))
+    fetch_user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if fetch_user == None:
+      # 入力ミス
+      response = make_response(render_template("./change_password.html", condition=1))
+      return response
+    else:
+      # パスワードの変更
+      # SQL操作
+      conn = sqlite3.connect("./static/database/kakaria.db")
+      cur = conn.cursor()
+      cur.execute("UPDATE user SET password = ? WHERE user_name == ? AND password == ?", (password_hash(str(new_password)), user_name, password_hash(str(old_password))))
+      cur.close()
+      conn.commit()
+      conn.close()
+      return redirect(url_for('index'))
 
 @app.route('/sinup_complete')
 def sinup_complete():
@@ -169,6 +191,20 @@ def create_sessid(user_id):
   
   print(f"\treturn {sessid=}")
   return sessid
+
+# セッション認証
+def authentication_session():
+  # cookieの取得
+  cookie_sessid = request.cookies.get("SESSID")
+
+  # SQL操作[セッションIDの検索]
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+  cur.execute("SELECT * FROM session WHERE session_id == ?", (cookie_sessid, ))
+  fetch_session = cur.fetchone()
+  cur.close()
+  conn.close()
+  return fetch_session
 
 if __name__ == "__main__":
   app.run(debug=True)
