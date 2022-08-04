@@ -1,0 +1,23 @@
+{% extends "./base.html" %}
+
+{% block body %}
+  <h1>ログインシステム</h1>
+  
+  <!-- 入力ミスの場合 -->
+  {% if condition == 1 %}
+    <p>入力ミスがあります。もう一度お願いします。</p>
+  {% endif %}
+  
+  <!-- 通常表示 -->
+  <form action="./login" method="post">
+    <p>ユーザ名</p>
+    <input type="text" name="user_name">
+    <p>パスワード</p>
+    <input type="text" name="password">
+    <p>送信ボタン</p>
+    <input type="submit">
+  </form>
+  <br>
+  <a href="./sinup">新規登録</a>
+  <a href="./change_password">パスワード変更</a>
+{% endblock %}
