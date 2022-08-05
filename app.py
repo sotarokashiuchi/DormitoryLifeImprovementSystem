@@ -20,15 +20,13 @@ def index():
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
 
-  fetch_session = authentication_session()
-
-  if fetch_session == None:
-    # セッション認証非完了
-    response = make_response(render_template("./index.html", session=1))
-  else:
+  if authentication_session() == 0:
     # セッション認証完了
     response = make_response(render_template("./index.html", session=0))
-  return response
+    return response
+  else:
+    # セッション認証非完了
+    return redirect(url_for('login'))
 
 @app.route('/ryosyoku_order')
 def ryosyoku_order():
@@ -193,6 +191,10 @@ def create_sessid(user_id):
   return sessid
 
 # セッション認証
+'''
+戻り値0:認証成功
+戻り値1:認証失敗
+'''
 def authentication_session():
   # cookieの取得
   cookie_sessid = request.cookies.get("SESSID")
@@ -204,7 +206,13 @@ def authentication_session():
   fetch_session = cur.fetchone()
   cur.close()
   conn.close()
-  return fetch_session
+
+  if fetch_session == None:
+    # セッション認証非完了
+    return 1
+  else:
+    # セッション認証完了
+    return 0
 
 if __name__ == "__main__":
   app.run(debug=True)
