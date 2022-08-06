@@ -85,7 +85,7 @@ cur.execute(
   "CREATE TABLE reservation("
     "menu_id INTEGER,"
     "user_id INTEGER,"
-    "conditon INTEGER,"
+    "condition INTEGER,"
     "answer INTEGER,"
     "PRIMARY KEY(menu_id, user_id),"
     "FOREIGN KEY(menu_id) REFERENCES menu (menu_id),"
@@ -126,8 +126,8 @@ cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum
 cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(4, 1, date('2022-08-02'), 1, 2, 20)")
 conn.commit()
 
-# 表
-# cur.execute("INSERT INTO user(user_name, password, permission) VALUES('樫内蒼太朗', '432', 1)")
+# user表
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('a', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
 conn.commit()
 
 cur.close()

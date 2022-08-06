@@ -2,14 +2,16 @@
 
 {% block body %}
   <h1>予約</h1>
-  <form action="/ryosyoku_order/week" method="post">
+  <form action="/ryosyoku_order/week?key={{key}}" method="post">
     {% set ns = namespace(old_menu = 0) %}
     {% for menu_id, set, date, time, food_name in menu_list %}
       {% if ns.old_menu - menu_id != 0 or loop.index == 1 %}  <!-- loop.indexは特殊な変数.ループの回数を保持 -->
         <!-- 新しい日付,新しい時間帯 -->
         <p>{{date}}({{time}})</p>
+        <input type="radio" name="{{menu_id}}" value="{{set}}" checked>{{set}}:{{food_name}}
+      {% else %}
+        <input type="radio" name="{{menu_id}}" value="{{set}}">{{set}}:{{food_name}}
       {% endif %}
-      <input type="radio" name="{{menu_id}}" value="{{set}}">{{set}}:{{food_name}}
       <br>
       {% set ns.old_menu = menu_id%}
     {% endfor %}

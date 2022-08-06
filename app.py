@@ -21,7 +21,7 @@ def index():
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
 
-  if authentication_session() == 0:
+  if authentication_session() != -1:
     # セッション認証完了
     response = make_response(render_template("./index.html"))
     return response
@@ -31,7 +31,7 @@ def index():
 
 @app.route('/ryosyoku_order')
 def ryosyoku_order():
-  if authentication_session() == 0:
+  if authentication_session() != -1:
     # セッション認証完了
     response = make_response(render_template("./ryosyoku_order.html"))
     return response
@@ -45,15 +45,17 @@ def week():
   #   # セッション認証非完了
   #   return redirect(url_for('login'))
   # セッション認証完了
+  
   key = request.args.get("key")
-  today = datetime.date.today()
-  print(today)
-  print(today.weekday())
-  monday = today - datetime.timedelta(days=today.weekday())
-  print(monday)
-  if key == '1' or key == '2':
-    # week1,2
+  if key != '1' and key != '2':
+    # week1,2以外にアクセス
+    return redirect(url_for('ryosyoku_order'))
+
+  if request.method == "GET":
+    # GET
     # SQL操作 [メニューの取得]
+    today = datetime.date.today()
+    monday = today - datetime.timedelta(days=today.weekday())
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
     SQL = '''
@@ -69,9 +71,43 @@ def week():
     menu_list = cur.fetchall()
     cur.close()
     conn.close()
-    print(f"fetch_menu={menu_list}")
-  response = make_response(render_template("./week.html", menu_list=menu_list))
-  return response
+    print(f"fetch_menu={menu_list}", end="\n")
+    response = make_response(render_template("./week.html", menu_list=menu_list, key=key))
+    return response
+  else:
+    # POST
+    # SQL操作 [メニューの取得]
+    today = datetime.date.today()
+    monday = today - datetime.timedelta(days=today.weekday())
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    SQL = '''
+    SELECT DISTINCT menu.menu_id 
+    FROM menu 
+    WHERE date BETWEEN date(?) AND date(?)
+    '''
+    cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
+    print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
+    menu_id_list = cur.fetchall()
+    cur.close()
+    conn.close()
+    print(f"fetch_menu={menu_id_list}", end="\n")
+    for menu_id in menu_id_list:
+      # POSTを受け取る
+      set = request.form[str(menu_id[0])]
+      user_id = authentication_session()
+
+      # SQL操作 [メニューの取得]
+      conn = sqlite3.connect("./static/database/kakaria.db")
+      cur = conn.cursor()
+      cur.execute("SELECT sets_id FROM sets WHERE set_str = ?", (set, ))
+      set_id = cur.fetchone()
+      cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (int(menu_id[0]), user_id, int(set_id[0])))
+      conn.commit()
+      cur.close()
+      conn.close()
+    return redirect(url_for('ryosyoku_order'))
+  
 
 
 @app.route('/ryosyoku_feeling')
@@ -243,17 +279,17 @@ def authentication_session():
   # SQL操作[セッションIDの検索]
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
-  cur.execute("SELECT * FROM session WHERE session_id == ?", (cookie_sessid, ))
+  cur.execute("SELECT user_id FROM session WHERE session_id == ?", (cookie_sessid, ))
   fetch_session = cur.fetchone()
   cur.close()
   conn.close()
 
   if fetch_session == None:
     # セッション認証非完了
-    return 1
+    return -1
   else:
     # セッション認証完了
-    return 0
+    return int(fetch_session[0])
 
 if __name__ == "__main__":
   app.run(debug=True)
