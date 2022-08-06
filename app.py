@@ -1,8 +1,6 @@
 # flaskのインポート
-from ast import And
 import hashlib
 import random
-from tkinter import Y
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 import sqlite3
 import datetime
