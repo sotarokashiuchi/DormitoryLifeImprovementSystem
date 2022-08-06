@@ -8,6 +8,7 @@ conn = sqlite3.connect("./static/database/kakaria.db")
 cur = conn.cursor()
 
 # 1.ユーザ表作成
+# permission 1:一般ユーザ 0:システム管理者 2:寮食管理者
 cur.execute(
   "CREATE TABLE user("
     "user_id INTEGER,"
@@ -127,7 +128,11 @@ cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum
 conn.commit()
 
 # user表
-cur.execute("INSERT INTO user(user_name, password, permission) VALUES('a', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('1', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('2', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('3', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('4', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('s', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 2)")
 conn.commit()
 
 cur.close()
