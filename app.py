@@ -2,6 +2,7 @@
 from ast import And
 import hashlib
 import random
+from tkinter import Y
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 import sqlite3
 import datetime
@@ -22,7 +23,7 @@ def index():
 
   if authentication_session() == 0:
     # セッション認証完了
-    response = make_response(render_template("./index.html", session=0))
+    response = make_response(render_template("./index.html"))
     return response
   else:
     # セッション認証非完了
@@ -30,8 +31,48 @@ def index():
 
 @app.route('/ryosyoku_order')
 def ryosyoku_order():
-  response = make_response(render_template("./ryosyoku_order.html"))
+  if authentication_session() == 0:
+    # セッション認証完了
+    response = make_response(render_template("./ryosyoku_order.html"))
+    return response
+  else:
+    # セッション認証非完了
+    return redirect(url_for('login'))
+
+@app.route('/ryosyoku_order/week', methods=["POST", "GET"])
+def week():
+  # if authentication_session() != 0:
+  #   # セッション認証非完了
+  #   return redirect(url_for('login'))
+  # セッション認証完了
+  key = request.args.get("key")
+  today = datetime.date.today()
+  print(today)
+  print(today.weekday())
+  monday = today - datetime.timedelta(days=today.weekday())
+  print(monday)
+  if key == '1' or key == '2':
+    # week1,2
+    # SQL操作 [メニューの取得]
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    SQL = '''
+    SELECT menu.menu_id, sets.set_str, menu.date, times.time_str, food.food_name
+    FROM menu 
+      INNER JOIN sets ON menu.sets_id = sets.sets_id
+      INNER JOIN times ON menu.times_id = times.times_id
+      INNER JOIN food ON menu.food_id = food.food_id
+    WHERE date BETWEEN date(?) AND date(?)
+    '''
+    cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
+    print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
+    menu_list = cur.fetchall()
+    cur.close()
+    conn.close()
+    print(f"fetch_menu={menu_list}")
+  response = make_response(render_template("./week.html", menu_list=menu_list))
   return response
+
 
 @app.route('/ryosyoku_feeling')
 def ryosyoku_feeling():
