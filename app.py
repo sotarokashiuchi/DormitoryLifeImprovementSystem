@@ -20,6 +20,8 @@ def index():
   # Jinja2と呼ばれるテンプレートエンジンを使用して
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
+  response = make_response(render_template("./index.html"))
+  return response
 
   if (authentication_session())[0] != -1:
     # セッション認証完了
