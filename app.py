@@ -1,9 +1,13 @@
 # flaskのインポート
+import calendar
 import hashlib
 import random
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 import sqlite3
 import datetime
+
+# グローバル変数
+YEAR = 2022
 
 # flaskクラスのインスタンスを作成
 app = Flask(__name__)
@@ -18,9 +22,6 @@ def index():
   # Jinja2と呼ばれるテンプレートエンジンを使用して
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
-  # 後から追加
-  response = make_response(render_template("./index.html"))
-  return response
 
   if (authentication_session())[0] != -1:
     # セッション認証完了
@@ -130,7 +131,6 @@ def control_result():
     # WHERE date BETWEEN date(?) AND date(?)
     cur.execute(SQL)
     fetch_reservation = cur.fetchall()
-    print(fetch_reservation)
     cur.close()
     conn.close()
     response = make_response(render_template("./control-result.html", reservation_list=fetch_reservation))
@@ -138,6 +138,91 @@ def control_result():
   else:
     return redirect(url_for('login'))
 
+
+@app.route('/ryosyoku_order/control/input', methods=["POST", "GET"])
+def control_input():
+  if (authentication_session())[1] == 2:
+    # 寮食管理者認証完了
+    response = make_response(render_template("./control-input.html"))
+    return response
+  else:
+    return redirect(url_for('login'))
+
+@app.route('/ryosyoku_order/control/input/month', methods=["POST", "GET"])
+def month():
+  if (authentication_session())[1] != 2:
+    # セッション認証非完了
+    return redirect(url_for('login'))
+  # セッション認証完了
+  
+  key = request.args.get("key")
+  if not(1 <= int(key) <=12) :
+    # 1~12月以外にアクセス
+    return redirect(url_for('control_input'))
+
+  if request.method == "GET":
+    # GET
+    max_day = calendar.monthrange(YEAR, int(key))[1]
+    month_list = []
+    for count in range(max_day):
+      month_list.append((int(key), count + 1))
+    response = make_response(render_template("./month.html", month_list=month_list, key=key))
+    return response
+  else:
+    # POST
+    max_day = calendar.monthrange(YEAR, int(key))[1]
+    menu_list = []
+    times = ['朝', '昼', '夜']
+    sets = ['A', 'B']
+    # POSTを受け取る
+    for day in range(max_day):
+      for time in times:
+        for set in sets:
+          # 書式 {{month}}:{{day}}:{{time}}:A:name
+          food_name = request.form[f"{key}:{day+1}:{time}:{set}:name"]
+          number = request.form[f"{key}:{day+1}:{time}:{set}:number"]
+          if food_name != "":
+            if number == "":
+              number = '0'
+            menu_list.append((f"{YEAR}-{int(key):02}-{int(day+1):02}", time, set, food_name, number))
+    print(menu_list)
+    
+    # SQL操作 [menu_idの最大値を取得]
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    cur.execute("SELECT MAX(menu_id) FROM menu")
+    max_menu_id = int(cur.fetchone()[0])
+    cur.close()
+    conn.close()
+
+    old_date = ""
+    old_time = 0
+    for date, time, set, food_name, minimum_number in menu_list:
+      # SQL操作 [メニューに登録]
+      conn = sqlite3.connect("./static/database/kakaria.db")
+      cur = conn.cursor()
+      cur.execute("SELECT sets_id FROM sets WHERE set_str = ?", (set, ))
+      set_id = cur.fetchone()
+      cur.execute("SELECT times_id FROM times WHERE time_str = ?", (time, ))
+      time_id = cur.fetchone()
+      cur.execute("SELECT food_id FROM food WHERE food_name = ?", (food_name, ))
+      food_id = cur.fetchone()
+      if food_id == None:
+        cur.execute("INSERT INTO food(food_name) VALUES(?)", (food_name, ))
+        conn.commit()
+        cur.execute("SELECT food_id FROM food WHERE food_name = ?", (food_name, ))
+        food_id = cur.fetchone()
+      
+      if old_date != date or old_time != time_id:
+        # menu_idをインクリメント
+        max_menu_id += 1
+      cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(?, ?, date(?), ?, ?, ?)", (max_menu_id, set_id[0], date, time_id[0], food_id[0], minimum_number))
+      conn.commit()
+      cur.close()
+      conn.close()
+      old_date = date
+      old_time = time_id
+    return redirect(url_for('control_input'))
 
 @app.route('/ryosyoku_feeling')
 def ryosyoku_feeling():
