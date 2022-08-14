@@ -23,13 +23,33 @@ def index():
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
 
-  if (authentication_session())[0] != -1:
-    # セッション認証完了
-    response = make_response(render_template("./index.html"))
-    return response
-  else:
+  if (authentication_session())[0] == -1:
     # セッション認証非完了
     return redirect(url_for('login'))
+  else:
+    # セッション認証完了
+    user_id = authentication_session()[0]
+    # SQL操作 [メニューの取得]
+    today = datetime.date.today()
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    SQL='''
+    SELECT times.time_str, sets.set_str, food.food_name
+    FROM reservation 
+      INNER JOIN menu ON reservation.menu_id = menu.menu_id
+                    AND  reservation.answer = menu.sets_id
+      INNER JOIN sets ON reservation.answer = sets.sets_id
+      INNER JOIN times ON menu.times_id = times.times_id
+      INNER JOIN food ON menu.food_id = food.food_id
+    WHERE reservation.user_id = ? AND menu.date = date(?)
+    '''
+    cur.execute(SQL, (user_id, today))
+    order_list = cur.fetchall()
+    print(f"orderlist = {order_list}")
+    cur.close()
+    conn.close()
+    response = make_response(render_template("./index.html", order_list=order_list, today=str(today)))
+    return response
 
 @app.route('/ryosyoku_order')
 def ryosyoku_order():
@@ -390,8 +410,11 @@ def create_sessid(user_id):
 
 # セッション認証
 '''
-戻り値0:認証成功
-戻り値1:認証失敗
+戻り値[0]
+  -1:認証失敗
+   x:user_id
+戻り値[1]
+   1:一般ユーザ権限
 '''
 def authentication_session():
   # cookieの取得
