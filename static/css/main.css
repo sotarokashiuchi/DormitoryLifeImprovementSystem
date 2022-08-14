@@ -1,3 +1,7 @@
+/* common */
+
+
+/* base */
 a{
   text-decoration: none;
   color: black;
@@ -43,3 +47,44 @@ a{
   margin-right: 10px;
   line-height: 20px;
 }
+
+/* login */
+body{
+  background-color:  #f9fbfe;
+}
+
+.body{
+  text-align: center;
+}
+
+.elementstyle {
+  font-family: sans-serif;
+  margin: 10% 37%;
+  color: rgb(39, 39, 40);
+  background-color: rgb(244, 244, 244);
+  border: 1px solid #555; 
+}
+
+.color{
+  color:rgb(244, 244, 244); 
+}
+
+input[type="text"] {
+  width: 300px;
+  padding: 4px;
+  font-size: 14px;
+}
+
+input[type="password"] {
+  width: 300px;
+  padding: 4px;
+  font-size: 14px;
+}
+
+input[type="submit"] {
+  width: 300px;
+  padding: 4px;
+  font-size: 14px;
+  background-color: aliceblue;
+  border: 1px solid
+} 
