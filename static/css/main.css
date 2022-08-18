@@ -1,11 +1,20 @@
 /* common */
 body{ 
-  background-color:  #f9fbfe;
+  background-color:#F4F5F7;
+  margin: 0px;
 }
 
 a{
+  display: block;
   text-decoration: none;
   color: black;
+  padding: 14px 2px;
+}
+
+.changecolor :hover{
+  background-color: red;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 /* base */
@@ -13,7 +22,7 @@ a{
   display: flex;
   flex-direction: column;
   padding: 0.5rem;
-  background-color: rgb(0, 208, 255);
+  background-color:#F4F5F7;
 }
 .nav1{
   display: flex;
@@ -32,37 +41,48 @@ a{
   line-height: 10px;
 }
 .logo{
-  font-size: 40px;
-  width: 120px;
+  font-size: 60px;
+  width: 200px;
   height: 50px;
   line-height: 60px;
   text-align: center;
   margin-left: 50px;
+  font-family: 'Vollkorn',serif;
+  text-shadow: 1px 2px 3px #808080;
 }
+
+.logo :hover{
+  color: red;
+  font-size: 62px;
+  font-weight: bold;
+}
+
 .nav2 ul{
   display: flex;
   list-style: none;
+  justify-content: center;
 }
 .nav2 li{
   width: 300px;
   text-align: center;
   font-size: 20px;
-  margin-right: 10px;
-  line-height: 20px;
+  justify-content: space-around;
 }
 
 /* login */
 .body{
   text-align: center;
-} 
+}
+
 .elementstyle {
   font-family: sans-serif;
-  margin: 120px auto 60px auto;
+  margin: 60px auto 60px auto;
   color: rgb(39, 39, 40);
   background-color: rgb(244, 244, 244);
   border: 1px solid #555; 
   max-width: 365px;
-}  
+}
+
 .color{
   color:rgb(244, 244, 244); 
 }
@@ -77,8 +97,7 @@ input[type="password"] {
   width: 220px;
   padding: 5px;
   font-size: 1px; 
-}  
-
+}
 
 input[type="submit"] {
   margin-bottom: 20px;
@@ -87,9 +106,35 @@ input[type="submit"] {
   padding: 5px;
   font-size: 1px;
   background-color: aliceblue;
-  border: 1px solid
+  border: 1px solid;
+  display: inline-block;
+  padding: 8em 3em;
+  background-color: rgb(0, 208, 255); /* 背景色 */
+  box-shadow: 0 5px 0 #4178ef; /* 影の太さ・色 */
+  border-radius: 60px;
+  border-color: white;
+  color: #0b0a63;
+  cursor: pointer;
+  text-decoration: none; /* 文字の下線を消す */
 } 
+
+.change:active {
+  box-shadow: none;
+  transform: translateY(5px);
+}
 
 .miss{
   color: red;
+}
+
+.regulation {
+  color: rgb(0, 187, 255);
+}
+
+.regulation:hover {
+  color: #3562c2;
+} 
+
+.regulation1 {
+  color: rgb(244, 244, 244); 
 }
