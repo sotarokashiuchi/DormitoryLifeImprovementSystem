@@ -67,6 +67,7 @@ def week():
     # セッション認証非完了
     return redirect(url_for('login'))
   # セッション認証完了
+  user_id = (authentication_session())[0]
   
   key = request.args.get("key")
   if key != '1' and key != '2':
@@ -75,11 +76,12 @@ def week():
 
   if request.method == "GET":
     # GET
-    # SQL操作 [メニューの取得]
+    # SQL操作
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+    # [メニューの取得]
     SQL = '''
     SELECT menu.menu_id, sets.set_str, menu.date, times.time_str, food.food_name
     FROM menu 
@@ -91,10 +93,27 @@ def week():
     cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
     print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
     menu_list = cur.fetchall()
+
+    menu_answer_list = []
+    for menu in menu_list:
+      # 予約状況の取得
+      SQL = '''
+      SELECT *
+      FROM reservation
+        INNER JOIN sets ON reservation.answer = sets.sets_id
+      WHERE menu_id = ? AND user_id = ? AND condition = 0 AND sets.set_str = ?
+      '''
+      cur.execute(SQL, (menu[0], user_id, menu[1]))
+      answer = cur.fetchone()
+      if answer != None:
+        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
+      else:
+        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], ""))    
+      
     cur.close()
     conn.close()
-    print(f"fetch_menu={menu_list}", end="\n")
-    response = make_response(render_template("./week.html", menu_list=menu_list, key=key))
+    print(f"menu_anserw_list={menu_answer_list}")
+    response = make_response(render_template("./week.html", menu_answer_list=menu_answer_list, key=key))
     return response
   else:
     # POST
@@ -117,14 +136,29 @@ def week():
     for menu_id in menu_id_list:
       # POSTを受け取る
       set = request.form[str(menu_id[0])]
-      user_id = (authentication_session())[0]
 
-      # SQL操作 [メニューの取得]
+      # SQL操作 []
       conn = sqlite3.connect("./static/database/kakaria.db")
       cur = conn.cursor()
       cur.execute("SELECT sets_id FROM sets WHERE set_str = ?", (set, ))
       set_id = cur.fetchone()
-      cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (int(menu_id[0]), user_id, int(set_id[0])))
+
+      # 既にデータベースに登録されているか確認
+      cur.execute("SELECT * FROM reservation WHERE menu_id = ? AND user_id = ?", (int(menu_id[0]), user_id))
+      if cur.fetchone() == None:
+        # 未登録
+        cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (int(menu_id[0]), user_id, int(set_id[0])))
+      else:
+        # 登録済み
+        SQL='''
+        UPDATE reservation 
+        SET menu_id = ?,
+            user_id = ?,
+            condition = 0,
+            answer = ?
+        WHERE menu_id = ? AND user_id = ?
+        '''
+        cur.execute(SQL, (int(menu_id[0]), user_id, int(set_id[0]), int(menu_id[0]), user_id))
       conn.commit()
       cur.close()
       conn.close()
