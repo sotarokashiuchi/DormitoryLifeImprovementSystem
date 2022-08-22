@@ -217,10 +217,38 @@ def month():
   if request.method == "GET":
     # GET
     max_day = calendar.monthrange(YEAR, int(key))[1]
-    month_list = []
+    menu_list = []
+    # SQL操作 [menu_idの最大値を取得]
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
     for count in range(max_day):
-      month_list.append((int(key), count + 1))
-    response = make_response(render_template("./month.html", month_list=month_list, key=key))
+      for time in ["朝", "昼", "夜"]:
+        SQL = '''
+        SELECT menu.sets_id, food.food_name
+        FROM menu
+          INNER JOIN food ON menu.food_id = food.food_id
+          INNER JOIN times ON menu.times_id = times.times_id
+        WHERE menu.date = date(?)
+          AND times.time_str = ?
+        ORDER BY menu.sets_id ASC
+        '''
+        cur.execute(SQL, (datetime.date(YEAR, int(key), count+1), time))
+        food_names = cur.fetchall()
+        print(f"food_names={food_names}")
+        food_name_list = ["", ""]
+        if food_names != None:
+          for set, food_name in food_names:
+            if set == 0:
+              food_name_list[0] = food_name
+            elif set == 1:
+              food_name_list[1] = food_name
+            else:
+              continue
+        menu_list.append((int(key), count + 1, time, (food_name_list[0], food_name_list[1])))
+    cur.close()
+    conn.close()
+    print(f"menu_list{menu_list}")
+    response = make_response(render_template("./month.html", menu_list=menu_list, key=key))
     return response
   else:
     # POST
@@ -252,9 +280,9 @@ def month():
     old_date = ""
     old_time = 0
     for date, time, set, food_name, minimum_number in menu_list:
-      # SQL操作 [メニューに登録]
       conn = sqlite3.connect("./static/database/kakaria.db")
       cur = conn.cursor()
+      # SQL操作 [メニューに登録]
       cur.execute("SELECT sets_id FROM sets WHERE set_str = ?", (set, ))
       set_id = cur.fetchone()
       cur.execute("SELECT times_id FROM times WHERE time_str = ?", (time, ))
@@ -267,10 +295,24 @@ def month():
         cur.execute("SELECT food_id FROM food WHERE food_name = ?", (food_name, ))
         food_id = cur.fetchone()
       
-      if old_date != date or old_time != time_id:
-        # menu_idをインクリメント
-        max_menu_id += 1
-      cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(?, ?, date(?), ?, ?, ?)", (max_menu_id, set_id[0], date, time_id[0], food_id[0], minimum_number))
+      # 未登録か検索
+      cur.execute("SELECT * FROM menu WHERE date = date(?) AND times_id = ? AND sets_id = ?", (date, time_id[0], set_id[0]))
+      if cur.fetchone() != None:
+        # メニューを更新
+        # SQL文
+        SQL='''
+        UPDATE menu
+        SET food_id = ?,
+            minimum_number = ? 
+        WHERE date = date(?) AND times_id = ? AND sets_id = ?
+        '''
+        cur.execute(SQL, (food_id[0], minimum_number, date, time_id[0], set_id[0]))
+        continue
+      else:
+        if old_date != date or old_time != time_id:
+          # menu_idをインクリメント
+          max_menu_id += 1
+        cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(?, ?, date(?), ?, ?, ?)", (max_menu_id, set_id[0], date, time_id[0], food_id[0], minimum_number))
       conn.commit()
       cur.close()
       conn.close()
