@@ -307,6 +307,7 @@ def month():
         WHERE date = date(?) AND times_id = ? AND sets_id = ?
         '''
         cur.execute(SQL, (food_id[0], minimum_number, date, time_id[0], set_id[0]))
+        conn.commit()
         continue
       else:
         if old_date != date or old_time != time_id:
