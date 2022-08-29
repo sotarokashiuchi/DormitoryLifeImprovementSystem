@@ -91,6 +91,7 @@ def week():
       INNER JOIN times ON menu.times_id = times.times_id
       INNER JOIN food ON menu.food_id = food.food_id
     WHERE date BETWEEN date(?) AND date(?)
+    ORDER BY menu.date ASC, menu.times_id ASC, menu.sets_id ASC
     '''
     cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
     print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
@@ -216,15 +217,27 @@ def month():
     # 1~12月以外にアクセス
     return redirect(url_for('control_input'))
 
+  week = calendar.monthrange(YEAR, int(key))[0]
+  max_day = calendar.monthrange(YEAR, int(key))[1]
+  # day_list = [day + 1 for day in range(max_day)]
+  day_list = []
+  for day in range(max_day):
+    if week == 5 or week == 6:
+      # day_list.remove(day+1)
+      week = (week + 1) % 7
+      continue
+    day_list.append((day+1, week))
+    week = (week + 1) % 7
+  print(day_list)
+
   if request.method == "GET":
     # GET
-    max_day = calendar.monthrange(YEAR, int(key))[1]
     menu_list = []
     # SQL操作 [menu_idの最大値を取得]
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
-    for count in range(max_day):
-      for time in ["朝", "昼", "夜"]:
+    for day, week in day_list:
+      for time in ["昼", "夜"]:
         SQL = '''
         SELECT menu.sets_id, food.food_name
         FROM menu
@@ -234,7 +247,7 @@ def month():
           AND times.time_str = ?
         ORDER BY menu.sets_id ASC
         '''
-        cur.execute(SQL, (datetime.date(YEAR, int(key), count+1), time))
+        cur.execute(SQL, (datetime.date(YEAR, int(key), day), time))
         food_names = cur.fetchall()
         print(f"food_names={food_names}")
         food_name_list = ["", ""]
@@ -246,7 +259,9 @@ def month():
               food_name_list[1] = food_name
             else:
               continue
-        menu_list.append((int(key), count + 1, time, (food_name_list[0], food_name_list[1])))
+        if week == 4 and time == "夜":
+          continue
+        menu_list.append((int(key), day, week_str(week), time, (food_name_list[0], food_name_list[1])))
     cur.close()
     conn.close()
     print(f"menu_list{menu_list}")
@@ -254,21 +269,28 @@ def month():
     return response
   else:
     # POST
-    max_day = calendar.monthrange(YEAR, int(key))[1]
     menu_list = []
     times = ['朝', '昼', '夜']
     sets = ['A', 'B']
     # POSTを受け取る
-    for day in range(max_day):
+    for day, week in day_list:
       for time in times:
         for set in sets:
+          if week == 4 and time == "夜":
+            continue
+          if time == "朝":
+            if set == "A":
+              menu_list.append((f"{YEAR}-{int(key):02}-{int(day):02}", time, set, "ご飯", 0))
+            else:
+              menu_list.append((f"{YEAR}-{int(key):02}-{int(day):02}", time, set, "パン", 0))
+            continue
           # 書式 {{month}}:{{day}}:{{time}}:A:name
-          food_name = request.form[f"{key}:{day+1}:{time}:{set}:name"]
-          number = request.form[f"{key}:{day+1}:{time}:{set}:number"]
+          food_name = request.form[f"{key}:{day}:{time}:{set}:name"]
+          number = request.form[f"{key}:{day}:{time}:{set}:number"]
           if food_name != "":
             if number == "":
               number = '0'
-            menu_list.append((f"{YEAR}-{int(key):02}-{int(day+1):02}", time, set, food_name, number))
+            menu_list.append((f"{YEAR}-{int(key):02}-{int(day):02}", time, set, food_name, number))
     print(menu_list)
     
     # SQL操作 [menu_idの最大値を取得]
@@ -528,6 +550,11 @@ def startup():
 
   return redirect(url_for('index'))
   
+# week数値を文字列に
+def week_str(week):
+  week_list = ["月", "火", "水", "木", "金", "土", "日"]
+  return week_list[week]
+
 
 # セッションIDの生成
 def create_sessid(user_id):
