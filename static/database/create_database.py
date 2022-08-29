@@ -82,6 +82,7 @@ cur.execute(
 conn.commit()
 
 # 4.予約表作成
+# condition 0 = 編集可能, 1 = 確定
 cur.execute(
   "CREATE TABLE reservation("
     "menu_id INTEGER,"

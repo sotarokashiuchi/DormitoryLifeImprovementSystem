@@ -4,14 +4,14 @@
 {% block body %}
     <div class="body">
     <div class="elementstyle">
-      <h1>Login</h1> 
+      <h1>ログイン</h1> 
       <!-- 通常表示   -->
       <form action="/login" method="post">
         <p>ユーザー名</p>
         <input type="text" name="user_name">
         <p>パスワード</p>
         <input type="password" name="password">
-        <input  type="submit" class="change">
+        <input  type="submit">
         {% if condition == 1 %}
           <!-- 入力ミスの場合 --> 
           <p class="miss">入力ミスがあります。もう一度お願いします。</p>
@@ -19,7 +19,6 @@
       </form>
       <br>
       <a href="/sinup" class="regulation">新規登録</a>
-      <a class="regulation1">調製</a>
       <a href="/change_password" class="regulation">パスワード変更</a>
     </div>
   </div> 

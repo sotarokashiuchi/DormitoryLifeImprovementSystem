@@ -1,16 +1,19 @@
 {% extends "./base.html" %}
 
 {% block body %}
-  <h1>新規会員登録</h1>
-  <form action="./sinup" method="post">
-    <p>ユーザ名</p>
-    <input type="text" name="user_name">
-    <p>パスワード</p>
-    <input type="text" name="password">
-    <p>送信ボタン</p>
-    <input type="submit">
-  </form>
-  <br>
-  <a href="./login">ログインシステム</a>
-  <a href="./change_password">パスワード変更</a>
+<div class="body">
+  <div class="elementstyle">
+    <h1>新規会員登録</h1>
+    <form action="./sinup" method="post">
+      <p>ユーザ名</p>
+      <input type="text" name="user_name">
+      <p>パスワード</p>
+      <input type="text" name="password">
+      <input type="submit">
+    </form>
+    <br>
+    <a href="./login" class="regulation">ログインシステム</a>
+    <a href="./change_password" class="regulation">パスワード変更</a>
+  </div>
+</div>
 {% endblock %}

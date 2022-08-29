@@ -8,6 +8,8 @@ import datetime
 
 # グローバル変数
 YEAR = 2022
+UPDATE = 2
+
 
 # flaskクラスのインスタンスを作成
 app = Flask(__name__)
@@ -455,6 +457,77 @@ def password_hash(password):
   password_sh = hashlib.sha256(password.encode()).hexdigest()
   print(f"\treturn {password_sh=}")
   return password_sh
+
+# @app.route('/startup', methods=["HEAD"])
+@app.route('/startup')
+def startup():
+  # SQL操作
+  now = datetime.datetime.now()
+  today = datetime.date.today()
+  # メンテナンス時間を3~4時
+  # if 3 <= now.hour < 4 and 1 == 1:# その日の一回だけ実行
+  if True:
+    # 3週間先のデータの追加
+    if today.weekday() == 0:
+      # 月曜日の場合
+      conn = sqlite3.connect("./static/database/kakaria.db")
+      cur = conn.cursor()
+
+      # [menu_idの取得]
+      SQL = '''
+      SELECT menu_id, MIN(sets_id)
+      FROM menu 
+      WHERE date BETWEEN date(?) AND date(?)
+      GROUP BY menu_id
+      '''
+      cur.execute(SQL, (today, today + (datetime.timedelta(days=6))))
+      menu_list = cur.fetchall()
+
+      # [user_idの取得]
+      SQL = '''
+      SELECT user_id
+      FROM user
+      WHERE permission = 1
+      '''
+      cur.execute(SQL)
+      user_list = cur.fetchall()
+      cur.close()
+      conn.close()
+      print(menu_list)
+      print(user_list)
+
+      for menu, set in menu_list:
+        for user in user_list:
+          conn = sqlite3.connect("./static/database/kakaria.db")
+          cur = conn.cursor()
+          # [menu_idの取得]
+          cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (menu, user[0], set))
+          conn.commit()
+          cur.close()
+          conn.close()
+
+    # 未入力者の確定処理
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+
+    # [menu_idの取得]
+    SQL = '''
+      UPDATE reservation
+      SET condition = 1
+      WHERE menu_id IN(
+        SELECT menu_id
+        FROM menu 
+        WHERE date = date(?)
+        GROUP BY menu_id
+      )
+    '''
+    cur.execute(SQL, (today + (datetime.timedelta(days=UPDATE)), ))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+  return redirect(url_for('index'))
+  
 
 # セッションIDの生成
 def create_sessid(user_id):

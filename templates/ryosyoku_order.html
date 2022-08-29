@@ -1,12 +1,21 @@
 {% extends "./base.html" %}
 
 {% block body %}
-  <h1>寮食予約システム </h1>
+<div class="body">
+  <div class="elementstyle1">
+    <h1>寮食予約システム </h1>
 
-  <!-- 注意事項 -->
-  <p>注意事項</p>  
+    <!-- 注意事項 -->
+    <p class="miss">注意事項</p> 
+    <p>三日前までに入力してください</p>
+    <p>注文数が上限に達した場合、自動的に割り振られます</p>
 
-  <!-- 週間ごとにリンク先を表示 -->
-  <a href="./ryosyoku_order/week?key=1">第一週目</a>
-  <a href="./ryosyoku_order/week?key=2">第二週目</a>
+    <!-- 週間ごとにリンク先を表示 -->
+    <div class="order1">
+      <a class="order" href="./ryosyoku_order/week?key=1">第一週目</a>
+      <a class="order" href="./ryosyoku_order/week?key=2">第二週目</a>
+    </div>
+         
+  </div>
+</div> 
 {% endblock %}
