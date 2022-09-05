@@ -82,7 +82,7 @@ cur.execute(
 conn.commit()
 
 # 4.予約表作成
-# condition 0 = 編集可能, 1 = 確定
+# condition 0 = 未入力, 1 = 確定, 2 = 入力済み
 cur.execute(
   "CREATE TABLE reservation("
     "menu_id INTEGER,"
@@ -154,6 +154,44 @@ cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum
 cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(17, 1, date('2022-08-31'), 1, 4, 20)")
 cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(18, 0, date('2022-08-31'), 2, 5, 20)")
 cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(18, 1, date('2022-08-31'), 2, 6, 20)")
+
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(19, 0, date('2022-09-05'), 0, 1, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(19, 1, date('2022-09-05'), 0, 2, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(20, 0, date('2022-09-05'), 1, 3, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(20, 1, date('2022-09-05'), 1, 4, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(21, 0, date('2022-09-05'), 2, 5, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(21, 1, date('2022-09-05'), 2, 6, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(22, 0, date('2022-09-06'), 0, 1, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(22, 1, date('2022-09-06'), 0, 2, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(23, 0, date('2022-09-06'), 1, 3, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(23, 1, date('2022-09-06'), 1, 4, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(24, 0, date('2022-09-06'), 2, 5, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(24, 1, date('2022-09-06'), 2, 6, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(25, 0, date('2022-09-07'), 0, 1, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(25, 1, date('2022-09-07'), 0, 2, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(26, 0, date('2022-09-07'), 1, 3, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(26, 1, date('2022-09-07'), 1, 4, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(27, 0, date('2022-09-07'), 2, 5, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(27, 1, date('2022-09-07'), 2, 6, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(28, 0, date('2022-09-08'), 0, 1, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(28, 1, date('2022-09-08'), 0, 2, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(29, 0, date('2022-09-08'), 1, 3, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(29, 1, date('2022-09-08'), 1, 4, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(30, 0, date('2022-09-08'), 2, 5, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(30, 1, date('2022-09-08'), 2, 6, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(31, 0, date('2022-09-09'), 0, 1, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(31, 1, date('2022-09-09'), 0, 2, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(32, 0, date('2022-09-09'), 1, 3, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(32, 1, date('2022-09-09'), 1, 4, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(33, 0, date('2022-09-09'), 2, 5, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(33, 1, date('2022-09-09'), 2, 6, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(34, 0, date('2022-09-10'), 0, 1, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(34, 1, date('2022-09-10'), 0, 2, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(35, 0, date('2022-09-10'), 1, 3, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(35, 1, date('2022-09-10'), 1, 4, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(36, 0, date('2022-09-10'), 2, 5, 20)")
+cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(36, 1, date('2022-09-10'), 2, 6, 20)")
+
 conn.commit()
 
 # user表

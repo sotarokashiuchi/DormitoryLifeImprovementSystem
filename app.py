@@ -155,18 +155,87 @@ def week():
         # 登録済み
         SQL='''
         UPDATE reservation 
-        SET menu_id = ?,
-            user_id = ?,
-            condition = 0,
+        SET condition = 2,
             answer = ?
         WHERE menu_id = ? AND user_id = ?
         '''
-        cur.execute(SQL, (int(menu_id[0]), user_id, int(set_id[0]), int(menu_id[0]), user_id))
+        cur.execute(SQL, (int(set_id[0]), int(menu_id[0]), user_id))
       conn.commit()
+      # 最小個数成立確認
+      # [未入力者数]
+      SQL = '''
+      SELECT COUNT(*)
+      FROM reservation
+      WHERE menu_id = ?
+        AND condition = 0
+      '''
+      cur.execute(SQL, (menu_id[0], ))
+      notcomplete_people = cur.fetchone()
+
+      # [セット別入力者数]
+      SQL = '''
+      SELECT answer, COUNT(*)
+      FROM reservation
+      GROUP BY menu_id, answer
+        HAVING  menu_id = ? 
+            AND condition = 2
+      '''
+      cur.execute(SQL, (menu_id[0], ))
+      complete_peoples = cur.fetchall()
+
+      # [セット別最小個数] // 昇順にしなダメ？
+      SQL = '''
+      SELECT sets_id, minimum_number
+      FROM menu
+      WHERE menu_id = ?
+      '''
+      cur.execute(SQL, (menu_id[0], ))
+      minimum_numbers = cur.fetchall()
+
+      people_count = 0
+      for count, answer, complete_people in enumerate(complete_peoples):
+        minimum_number = minimum_numbers[count][1]
+        if complete_people < minimum_number:
+          # 入力者が最小個数に達していない
+          people_count += minimum_number - complete_people
+      if people_count == notcomplete_people:
+        # 不足最小個数と未入力者が釣り合う(確定する時)
+        # [データ更新]
+        SQL = '''
+          SELECT user_id
+          FROM reservation
+          WHERE menu_id = ?
+            AND condition = 0
+        '''
+        cur.execute(SQL, (menu[0]))
+        user_id_list = cur.fetchall
+
+        for count, answer, complete_people in enumerate(complete_peoples):
+          minimum_number = minimum_numbers[count][1]
+          if complete_people < minimum_number:
+            # 入力者が最小個数に達していない
+            for i in range(minimum_number - complete_people):
+              SQL = '''
+                UPDATE reservation
+                SET condition = 1,
+                    answer = ?
+                WHERE menu_id = ?
+                  AND user_id = ?
+              '''
+              user_id = user_id_list.pop()
+              cur.execute(SQL, (answer, menu[0], user_id))
+              conn.commit()
       cur.close()
       conn.close()
-    return redirect(url_for('ryosyoku_order'))
+    return redirect(url_for('order_complete'))
   
+@app.route('/ryosyoku_order/order_complete')
+def order_complete():
+  if (authentication_session())[0] == -1:
+    # セッション認証非完了
+    return redirect(url_for('login'))
+  response = make_response(render_template("./order_complete.html"))
+  return response
 
 @app.route('/ryosyoku_order/control/result', methods=["POST", "GET"])
 def control_result():
