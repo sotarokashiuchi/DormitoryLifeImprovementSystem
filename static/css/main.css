@@ -2,6 +2,7 @@
 body{ 
   background-color:#F4F5F7;
   margin: 0px;
+  text-align: center;
 }
 /* base */
 .header{
@@ -10,7 +11,7 @@ body{
   padding: 0.5rem;
   background-color:#F4F5F7;
 }
-.header a{
+.nav1 a , .nav2 a{
   text-decoration: none;
   color: black;
 }
@@ -35,10 +36,11 @@ body{
 .logo :hover{
   opacity: 0.7 ;
 }
-/* ログインと新規登録の設定 */
-.nav1 ul{
+/* ログインと新規登録、トップ・寮食予約・寮食感想・お風呂状況の設定 */
+.nav1 ul , .nav2 ul{
   display: flex;
   list-style: none;
+  justify-content: center;
 }
 .nav1 li{
   width: 100px;
@@ -47,44 +49,17 @@ body{
   margin-right: 20px;
   line-height: 10px;
 }
-.nav1 li a {
-  padding:10px 10px 5px 10px;
-  position: relative;
-}
-.nav1 li a::before {
-  background: #ff701e;
-  content: '';
-  width: 100%;
-  height: 2px;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  margin: auto;
-  transform-origin: right top;
-  transform: scale(0, 1);
-  transition: transform .3s;
-}
-.nav1 li a:hover::before {
-  transform-origin: left top;
-  transform: scale(1, 1);
-}
-/* トップ、寮食予約、寮食感想、お風呂状況の設定 */
-.nav2 ul{
-  display: flex;
-  list-style: none;
-  justify-content: center;
-}
 .nav2 li{
   width: 300px;
   text-align: center;
   font-size: 20px;
   justify-content: space-around;
 }
-.nav2 li a {
-  padding: 10px 10px 5px 10px;
+.nav1 li a , .nav2 li a {
+  padding:10px 10px 5px 10px;
   position: relative;
 }
-.nav2 li a::before {
+.nav1 li a::before , .nav2 li a::before{
   background: #ff701e;
   content: '';
   width: 100%;
@@ -97,16 +72,12 @@ body{
   transform: scale(0, 1);
   transition: transform .3s;
 }
-.nav2 li a:hover::before {
+.nav1 li a:hover::before , .nav2 li a:hover::before{
   transform-origin: left top;
   transform: scale(1, 1);
 }
 
 /* login */
-.body{
-  text-align: center;
-}
-
 .elementstyle {
   font-family: sans-serif;
   margin: 60px auto 60px auto;
@@ -116,23 +87,13 @@ body{
   max-width: 365px;
 }
 
-.color{
-  color:rgb(244, 244, 244); 
-}
-
-input[type="text"] {
+input[type="text"] , input[type="password"]{
   width: 220px;
   padding: 5px;
   font-size: 1px;     
 } 
 
-input[type="password"] {
-  width: 220px;
-  padding: 5px;
-  font-size: 1px; 
-}
-
-input[type="submit"] {
+input[type="submit"] , form input[type="reset"]{
   padding-top: 3px;
   padding-bottom: 3px;
   margin-bottom: 20px;
@@ -150,6 +111,11 @@ input[type="submit"] {
 
 .miss{
   color: red;
+}
+
+.miss1{
+  color: red;
+  font-size: 13pt;
 }
 
 .regulation {
@@ -175,6 +141,7 @@ input[type="submit"] {
 .order{
   text-decoration: none;
   color: rgb(0, 187, 255);
+  font-size: 17pt;
 }
 
 .order1{
@@ -189,3 +156,24 @@ a.order{
 .order:hover{
   color: #3562c2;
 }
+
+.sinup2:hover{
+  color: #3562c2;
+}
+ 
+.sinup2{
+  color: rgb(0, 187, 255);
+}
+
+.sinup{
+  padding-top: 180px;
+  text-align: center;
+}
+ 
+.sinup1{
+  font-size: 33pt;
+  padding-bottom: 60px;
+}
+ 
+.sinup3{
+  font-size: 15pt;}

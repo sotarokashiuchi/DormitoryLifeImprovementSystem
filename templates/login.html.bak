@@ -2,6 +2,7 @@
 <!-- 上のリンク先を"./templates/base.html"に変更 -->
 
 {% block body %}
+    <div class="body">
     <div class="elementstyle">
       <h1>ログイン</h1> 
       <!-- 通常表示   -->
@@ -20,4 +21,5 @@
       <a href="/sinup" class="regulation">新規登録</a>
       <a href="/change_password" class="regulation">パスワード変更</a>
     </div>
+  </div> 
 {% endblock %}

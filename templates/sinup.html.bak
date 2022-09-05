@@ -11,7 +11,7 @@
     <input type="submit">
   </form>
   <br>
-  <a href="login" class="regulation">ログインシステム</a>
-  <a href="change_password" class="regulation">パスワード変更</a>
+  <a href="login">ログインシステム</a>
+  <a href="change_password">パスワード変更</a>
  </div>
 {% endblock %}

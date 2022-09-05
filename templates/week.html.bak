@@ -1,8 +1,7 @@
 {% extends "./base.html" %}
 
 {% block body %}
-  <!-- ↓何月何日～何月何日までの予約なのかを表示させてほしいです -->
-  <h1>A月B日～C月D日</h1>
+  <h1>予約</h1>
   <form action="/ryosyoku_order/week?key={{key}}" method="post">
     {% set ns = namespace(old_menu = 0) %}
     {% for menu_id, set, date, time, food_name, checked in menu_answer_list %}

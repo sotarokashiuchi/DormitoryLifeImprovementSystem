@@ -12,8 +12,8 @@
 
   <!-- 週間ごとにリンク先を表示 -->
   <div class="order1">
-    <a class="order"  href="/ryosyoku_order/week?key=1">第一週目</a>
-    <a class="order"  href="/ryosyoku_order/week?key=2">第二週目</a>
+    <a href="./ryosyoku_order/week?key=1">第一週目</a>
+    <a href="./ryosyoku_order/week?key=2">第二週目</a>
   </div>
  </div>
 {% endblock %}
