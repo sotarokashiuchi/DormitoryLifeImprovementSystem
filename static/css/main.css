@@ -177,3 +177,90 @@ a.order{
  
 .sinup3{
   font-size: 15pt;}
+  
+  
+
+/* week */
+/* リセットボタンと送信ボタンの設定 */
+.botton{
+  text-align: center;
+}
+/* h1タグの設定 */
+#week_h1{
+  font-size: 40px;
+  text-align: center;
+}
+.week_p{
+  margin: 0px;
+}
+.form{
+  font-size: 25px;
+}
+/* 表の設定 */
+table{
+  border-collapse: collapse;  /* th、tdなどの隣接するセルの枠線を重ねて表示する */
+  margin-right: auto;
+  margin-left: auto;
+}
+table th,table td{
+  border:1px #999 solid; /* 枠線をつける */
+}
+/* ラジオボタンの設定（装飾とか） */
+.container {
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.menu-label input[type=radio].menu-input {
+  display: none;
+}
+.menu-label {
+  position: relative;
+  min-width: 10%;
+  margin: 10px;
+}
+.menu-label .menu-text {
+  position: relative;
+  display: block;
+  padding-left: 35px;
+  cursor: pointer;
+}
+.menu-label .menu-text:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  margin: auto;
+  width: 24px;
+  height: 24px;
+}
+.menu-label input[type=radio].menu-input:checked + .menu-text:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  display: block;
+  margin: auto;
+}
+.menu-label .menu-text.round:before {
+  border: 1px solid #ddd;
+  border-radius: 40px;
+}
+.menu-label input[type=radio].menu-input:checked + .menu-text.round:after {
+  width: 16px;
+  height: 16px;
+  background-color: #4abdac;
+  border-radius: 40px;
+}
+/* control-input */
+#explanation{
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+#result{
+  display: block;
+  margin-top: 60px;
+}

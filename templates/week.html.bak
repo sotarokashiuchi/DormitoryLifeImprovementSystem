@@ -1,20 +1,45 @@
 {% extends "./base.html" %}
 
 {% block body %}
-  <h1>予約</h1>
+  <!-- ↓何月何日～何月何日までの予約なのかを表示させてほしいです -->
+  <h1>A月B日～C月D日</h1>
   <form action="/ryosyoku_order/week?key={{key}}" method="post">
     {% set ns = namespace(old_menu = 0) %}
     {% for menu_id, set, date, time, food_name, checked in menu_answer_list %}
       {% if ns.old_menu - menu_id != 0 or loop.index == 1 %}  <!-- loop.indexは特殊な変数.ループの回数を保持 -->
         <!-- 新しい日付,新しい時間帯 -->
-        <p>{{date}}({{time}})</p>
-      {% endif %}
-        <input type="radio" name="{{menu_id}}" value="{{set}}" {{checked}}>{{set}}:{{food_name}}
+        <table>
+          <tr>
+            <th>日付</th>
+            <th>メニュー</th>
+          </tr>
+          <tr>
+            <td>
+              <p>{{date}}({{time}})</p>
+            </td>
+            <td>
+              <div class="container">  
+                <label for="menuA" class="menu-label">
+                  <input type="radio" name="{{menu_id}}" value="{{set}}" {{checked}} id="menuA" class="menu-input">
+                  <span class="menu-text round">{{set}}:{{food_name}}{% else %}</span>
+                </label>
+              
+                <label for="menuB" class="menu-label">
+                  <input type="radio" name="{{menu_id}}" value="{{set}}" id="menuB" class="menu-input">
+                  <span class="menu-text round">{{set}}:{{food_name}}{% endif %}</span>
+                </label>
+              </div>
+            </td>
+          </tr>
+        </table>
       <br>
       {% set ns.old_menu = menu_id%}
     {% endfor %}
     
     <br>
-    <input type="submit">
+    <div class="botton">
+      <input type="reset" value="リセット">
+      <input type="submit">
+    </div>
   </form>
 {% endblock %}

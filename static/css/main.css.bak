@@ -141,6 +141,7 @@ input[type="submit"] , form input[type="reset"]{
 .order{
   text-decoration: none;
   color: rgb(0, 187, 255);
+  font-size: 17pt;
 }
 
 .order1{
@@ -155,3 +156,24 @@ a.order{
 .order:hover{
   color: #3562c2;
 }
+
+.sinup2:hover{
+  color: #3562c2;
+}
+ 
+.sinup2{
+  color: rgb(0, 187, 255);
+}
+
+.sinup{
+  padding-top: 180px;
+  text-align: center;
+}
+ 
+.sinup1{
+  font-size: 33pt;
+  padding-bottom: 60px;
+}
+ 
+.sinup3{
+  font-size: 15pt;}
