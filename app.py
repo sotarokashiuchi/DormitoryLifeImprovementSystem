@@ -10,6 +10,8 @@ import datetime
 # グローバル変数
 YEAR = 2022
 UPDATE = 2
+UPDATE_DAY = datetime.date.today()
+counts = 0
 
 
 # flaskクラスのインスタンスを作成
@@ -645,15 +647,35 @@ def password_hash(password):
   print(f"\treturn {password_sh=}")
   return password_sh
 
-# @app.route('/startup', methods=["HEAD"])
-@app.route('/startup')
+@app.route('/startup', methods=["HEAD"])
+# @app.route('/startup')
 def startup():
-  # SQL操作
   now = datetime.datetime.now()
   today = datetime.date.today()
+
+  # SQL操作
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+  SQL = '''
+  SELECT COUNT(*)
+  FROM log
+  WHERE date = date(?)
+  '''
+  cur.execute(SQL, (today, ))
+  log_f = cur.fetchone()
+  cur.close()
+  conn.close()
+
+  print(f"log = {log_f}")
+
   # メンテナンス時間を3~4時
-  # if 3 <= now.hour < 4 and 1 == 1:# その日の一回だけ実行
-  if True:
+  if 3 <= now.hour < 4 and log_f[0] == 0:# その日の一回だけ実行
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    cur.execute("INSERT INTO log(date) VALUES(date(?))", (today, ))
+    conn.commit()
+    cur.close()
+    conn.close()
     # 3週間先のデータの追加
     if today.weekday() == 0:
       # 月曜日の場合

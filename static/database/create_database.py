@@ -202,6 +202,15 @@ cur.execute("INSERT INTO user(user_name, password, permission) VALUES('4', 'ca97
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('s', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 2)")
 conn.commit()
 
+# 5.セッションID表
+cur.execute(
+  "CREATE TABLE log("
+    "date DATE,"
+    "PRIMARY KEY(date)"
+  ")"
+)
+conn.commit()
+
 cur.close()
 conn.close()
 
