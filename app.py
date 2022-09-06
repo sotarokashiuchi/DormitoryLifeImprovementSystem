@@ -647,8 +647,8 @@ def password_hash(password):
   print(f"\treturn {password_sh=}")
   return password_sh
 
-@app.route('/startup', methods=["HEAD"])
-# @app.route('/startup')
+# @app.route('/startup', methods=["HEAD"])
+@app.route('/startup')
 def startup():
   now = datetime.datetime.now()
   today = datetime.date.today()
