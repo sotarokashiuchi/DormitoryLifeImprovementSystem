@@ -196,6 +196,7 @@ a.order{
 .form{
   font-size: 25px;
 }
+
 /* 表の設定 */
 table{
   border-collapse: collapse;  /* th、tdなどの隣接するセルの枠線を重ねて表示する */
@@ -205,19 +206,21 @@ table{
 table th,table td{
   border:1px #999 solid; /* 枠線をつける */
 }
+
+
 /* ラジオボタンの設定（装飾とか） */
 .container {
-  display: flex;
+  display: inline-block;
   justify-content: center;
   box-sizing: border-box;
-}
-.menu-label input[type=radio].menu-input {
-  display: none;
 }
 .menu-label {
   position: relative;
   min-width: 10%;
   margin: 10px;
+}
+.menu-label input[type=radio].menu-input {
+  display: none;
 }
 .menu-label .menu-text {
   position: relative;
@@ -225,6 +228,7 @@ table th,table td{
   padding-left: 35px;
   cursor: pointer;
 }
+
 .menu-label .menu-text:before {
   content: "";
   position: absolute;
@@ -255,6 +259,7 @@ table th,table td{
   background-color: #4abdac;
   border-radius: 40px;
 }
+
 /* control-input */
 #explanation{
   margin-top: 40px;

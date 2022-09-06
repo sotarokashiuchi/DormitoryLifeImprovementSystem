@@ -3,12 +3,12 @@
 {% block body %}
   <h1>入力{{month}}月</h1>
   <form action="/ryosyoku_order/control/input/month?key={{key}}" method="post">
-    {% for month, day, week, time, text_value in menu_list %}
+    {% for month, day, week, time, text_value, minimum_number in menu_list %}
       <p>{{month}}月{{day}}日({{week}})({{time}})</p>
       Aセット:<input type="text" name="{{month}}:{{day}}:{{time}}:A:name" value="{{text_value[0]}}">
-      最小個数:<input type="number" name="{{month}}:{{day}}:{{time}}:A:number"><br>
+      最小個数:<input type="number" name="{{month}}:{{day}}:{{time}}:A:number" value="{{minimum_number[0]}}"><br>
       Bセット:<input type="text" name="{{month}}:{{day}}:{{time}}:B:name" value="{{text_value[1]}}">
-      最小個数:<input type="number" name="{{month}}:{{day}}:{{time}}:B:number">
+      最小個数:<input type="number" name="{{month}}:{{day}}:{{time}}:B:number" value="{{minimum_number[1]}}">
     {% endfor %}
     <br>
     <input type="submit">

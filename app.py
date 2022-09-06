@@ -2,6 +2,7 @@
 import calendar
 import hashlib
 import random
+from traceback import print_tb
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 import sqlite3
 import datetime
@@ -91,9 +92,15 @@ def week():
       INNER JOIN times ON menu.times_id = times.times_id
       INNER JOIN food ON menu.food_id = food.food_id
     WHERE date BETWEEN date(?) AND date(?)
+      AND menu.menu_id IN (
+        SELECT DISTINCT menu_id
+        FROM reservation
+        WHERE user_id = ?
+          AND condition <> 1
+      )
     ORDER BY menu.date ASC, menu.times_id ASC, menu.sets_id ASC
     '''
-    cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
+    cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6)), user_id))
     print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
     menu_list = cur.fetchall()
 
@@ -101,17 +108,28 @@ def week():
     for menu in menu_list:
       # 予約状況の取得
       SQL = '''
-      SELECT *
+      SELECT COUNT(*)
       FROM reservation
         INNER JOIN sets ON reservation.answer = sets.sets_id
-      WHERE menu_id = ? AND user_id = ? AND condition = 0 AND sets.set_str = ?
+      WHERE menu_id = ? AND user_id = ? AND condition = 2
       '''
-      cur.execute(SQL, (menu[0], user_id, menu[1]))
-      answer = cur.fetchone()
-      if answer != None:
-        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
+      cur.execute(SQL, (menu[0], user_id))
+      condition_f = cur.fetchone()
+      if condition_f[0] != 0:
+        SQL = '''
+        SELECT *
+        FROM reservation
+          INNER JOIN sets ON reservation.answer = sets.sets_id
+        WHERE menu_id = ? AND user_id = ? AND condition = 2 AND sets.set_str = ?
+        '''
+        cur.execute(SQL, (menu[0], user_id, menu[1]))
+        answer = cur.fetchone()
+        if answer != None:
+          menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
+        else:
+          menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], ""))
       else:
-        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], ""))    
+        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
       
     cur.close()
     conn.close()
@@ -125,12 +143,24 @@ def week():
     monday = today - datetime.timedelta(days=today.weekday())
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+    # SQL = '''
+    # SELECT DISTINCT menu.menu_id 
+    # FROM menu 
+    # WHERE date BETWEEN date(?) AND date(?)
+    # '''
     SQL = '''
-    SELECT DISTINCT menu.menu_id 
-    FROM menu 
-    WHERE date BETWEEN date(?) AND date(?)
+      SELECT DISTINCT menu_id
+      FROM reservation
+      WHERE user_id = ?
+        AND condition <> 1
+        AND menu_id IN (
+          SELECT DISTINCT menu.menu_id 
+          FROM menu 
+          WHERE date BETWEEN date(?) AND date(?)
+        )
+      
     '''
-    cur.execute(SQL, (monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
+    cur.execute(SQL, (user_id, monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
     print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
     menu_id_list = cur.fetchall()
     cur.close()
@@ -150,7 +180,8 @@ def week():
       cur.execute("SELECT * FROM reservation WHERE menu_id = ? AND user_id = ?", (int(menu_id[0]), user_id))
       if cur.fetchone() == None:
         # 未登録
-        cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (int(menu_id[0]), user_id, int(set_id[0])))
+        cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 2, ?)", (int(menu_id[0]), user_id, int(set_id[0])))
+        conn.commit()
       else:
         # 登録済み
         SQL='''
@@ -160,7 +191,7 @@ def week():
         WHERE menu_id = ? AND user_id = ?
         '''
         cur.execute(SQL, (int(set_id[0]), int(menu_id[0]), user_id))
-      conn.commit()
+        conn.commit()
       # 最小個数成立確認
       # [未入力者数]
       SQL = '''
@@ -171,17 +202,19 @@ def week():
       '''
       cur.execute(SQL, (menu_id[0], ))
       notcomplete_people = cur.fetchone()
+      print(f"未入力者数合計 notcomplete_people = {notcomplete_people}")
 
       # [セット別入力者数]
       SQL = '''
       SELECT answer, COUNT(*)
       FROM reservation
+      WHERE condition = 2
       GROUP BY menu_id, answer
-        HAVING  menu_id = ? 
-            AND condition = 2
+        HAVING  menu_id = ?
       '''
       cur.execute(SQL, (menu_id[0], ))
       complete_peoples = cur.fetchall()
+      print(f"セット別入力者数 complete_peoples = {complete_peoples}")
 
       # [セット別最小個数] // 昇順にしなダメ？
       SQL = '''
@@ -191,14 +224,40 @@ def week():
       '''
       cur.execute(SQL, (menu_id[0], ))
       minimum_numbers = cur.fetchall()
+      print(f"minimum_numbers = {minimum_numbers}")
 
+      # minimum_numbers.append((-1, -1))
+      # complete_peoples.append((-1, -1))
+      complete_people = 0
+      minimum_number = 0
       people_count = 0
-      for count, answer, complete_people in enumerate(complete_peoples):
-        minimum_number = minimum_numbers[count][1]
+      # complete_peoples_index = 0
+      
+      minimum_number_list = []
+      for minimum_number_set, minimum_number in minimum_numbers:
+        minimum_number_list.append(minimum_number_set)
+      minimum_number_list.sort()
+      
+      complete_people_list = []
+      for complete_people_set, complete_people in complete_peoples:
+        complete_people_list.append(complete_people_set)
+
+      for index in minimum_number_list:
+        if not(index in complete_people_list):
+          complete_peoples.append((index, 0))
+      complete_peoples.sort()
+
+      for count, minimum_number_t in enumerate(minimum_numbers):
+        minimum_number = minimum_number_t[1]
+        complete_people = complete_peoples[count][1]
+        
         if complete_people < minimum_number:
+          print(f"A menu_id = {menu_id[0]}")
           # 入力者が最小個数に達していない
           people_count += minimum_number - complete_people
-      if people_count == notcomplete_people:
+          print(f"people_count = {people_count}")
+      if people_count != 0 and people_count == notcomplete_people[0]:
+        print("B")
         # 不足最小個数と未入力者が釣り合う(確定する時)
         # [データ更新]
         SQL = '''
@@ -207,14 +266,18 @@ def week():
           WHERE menu_id = ?
             AND condition = 0
         '''
-        cur.execute(SQL, (menu[0]))
-        user_id_list = cur.fetchall
+        cur.execute(SQL, (menu_id[0], ))
+        user_id_lists = cur.fetchall()
+        print(f"user_id_lists = {user_id_lists}")
 
-        for count, answer, complete_people in enumerate(complete_peoples):
+        for count, complete_people in enumerate(complete_peoples):
+          while minimum_numbers[count][0] != complete_people[0]:
+            count += 1
           minimum_number = minimum_numbers[count][1]
-          if complete_people < minimum_number:
+          if complete_people[1] < minimum_number:
+            print("C")
             # 入力者が最小個数に達していない
-            for i in range(minimum_number - complete_people):
+            for _ in range(minimum_number - complete_people[1]):
               SQL = '''
                 UPDATE reservation
                 SET condition = 1,
@@ -222,9 +285,39 @@ def week():
                 WHERE menu_id = ?
                   AND user_id = ?
               '''
-              user_id = user_id_list.pop()
-              cur.execute(SQL, (answer, menu[0], user_id))
+              user_id_list = user_id_lists.pop()
+              print(f"user_id_list = {user_id_list}")
+              cur.execute(SQL, (complete_people[0], menu_id[0], user_id_list[0]))
               conn.commit()
+        
+        # conditionを1に変更
+        SQL = '''
+          UPDATE reservation
+          SET condition = 1
+          WHERE menu_id = ?
+        '''
+        cur.execute(SQL, (menu_id[0], ))
+        conn.commit()
+      
+      # 全入力者確認
+      SQL = '''
+      SELECT COUNT(*)
+      FROM reservation
+      WHERE menu_id = ?
+        AND condition = 0
+      '''
+      cur.execute(SQL, (menu_id[0], ))
+      notinput_f = cur.fetchone()
+      print(notinput_f)
+      if notinput_f[0] == 0:
+        SQL = '''
+          UPDATE reservation
+          SET condition = 1
+          WHERE menu_id = ?
+        '''
+        cur.execute(SQL, (menu_id[0], ))
+        conn.commit()
+
       cur.close()
       conn.close()
     return redirect(url_for('order_complete'))
@@ -308,7 +401,7 @@ def month():
     for day, week in day_list:
       for time in ["昼", "夜"]:
         SQL = '''
-        SELECT menu.sets_id, food.food_name
+        SELECT menu.sets_id, food.food_name, menu.minimum_number
         FROM menu
           INNER JOIN food ON menu.food_id = food.food_id
           INNER JOIN times ON menu.times_id = times.times_id
@@ -320,17 +413,20 @@ def month():
         food_names = cur.fetchall()
         print(f"food_names={food_names}")
         food_name_list = ["", ""]
+        minimum_number_list = [0, 0]
         if food_names != None:
-          for set, food_name in food_names:
+          for set, food_name, minimum_number in food_names:
             if set == 0:
               food_name_list[0] = food_name
+              minimum_number_list[0] = minimum_number
             elif set == 1:
               food_name_list[1] = food_name
+              minimum_number_list[1] = minimum_number
             else:
               continue
         if week == 4 and time == "夜":
           continue
-        menu_list.append((int(key), day, week_str(week), time, (food_name_list[0], food_name_list[1])))
+        menu_list.append((int(key), day, week_str(week), time, (food_name_list[0], food_name_list[1]), (minimum_number_list[0], minimum_number_list[1])))
     cur.close()
     conn.close()
     print(f"menu_list{menu_list}")
@@ -358,7 +454,7 @@ def month():
           number = request.form[f"{key}:{day}:{time}:{set}:number"]
           if food_name != "":
             if number == "":
-              number = '0'
+              number = 0
             menu_list.append((f"{YEAR}-{int(key):02}-{int(day):02}", time, set, food_name, number))
     print(menu_list)
     
