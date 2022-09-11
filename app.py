@@ -10,8 +10,7 @@ import datetime
 # グローバル変数
 YEAR = 2022
 UPDATE = 2
-UPDATE_DAY = datetime.date.today()
-counts = 0
+TTL = 5
 
 
 # flaskクラスのインスタンスを作成
@@ -517,10 +516,81 @@ def ryosyoku_feeling():
   response = make_response(render_template("./ryosyoku_feeling.html"))
   return response
 
-@app.route('/bath')
+@app.route('/bath', methods=["GET", "POST"])
 def bath():
-  response = make_response(render_template("./bath.html"))
-  return response
+  if (authentication_session())[1] == -1:
+    # セッション認証非完了
+    return redirect(url_for('login'))
+  # セッション認証完了
+
+  user_id = authentication_session()[0]
+  today = datetime.date.today()
+
+  if request.method == "GET":
+    people_list = []
+
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    SQL='''
+    SELECT COUNT(*)
+    FROM bath
+    WHERE date = date(?)
+      AND user_id = ?
+      AND condition = 0
+    '''
+    cur.execute(SQL, (today, user_id))
+    bath_switch = cur.fetchone()
+    print(f"bath_switch = {bath_switch}")
+
+    SQL='''
+    SELECT COUNT(*)
+    FROM bath
+    WHERE date = date(?)
+      AND condition = 0
+    '''
+    cur.execute(SQL, (today, ))
+    people_list.append(cur.fetchone()[0])
+
+    SQL='''
+    SELECT COUNT(*)
+    FROM bath
+    WHERE date = date(?)
+      AND condition = 1
+    '''
+    cur.execute(SQL, (today, ))
+    people_list.append(cur.fetchone()[0])
+
+    SQL='''
+    SELECT COUNT(*)
+    FROM bath
+    WHERE date = date(?)
+      AND condition = 2
+    '''
+    cur.execute(SQL, (today, ))
+    people_list.append(cur.fetchone()[0])
+
+    cur.close()
+    conn.close()
+    response = make_response(render_template("./bath.html", bath_switch=bath_switch[0], people_list=people_list))
+    return response
+  else:
+    bath_switch = request.form["bath_switch"]
+
+    conn = sqlite3.connect("./static/database/kakaria.db")
+    cur = conn.cursor()
+    SQL='''
+    UPDATE bath
+    SET condition = 1
+    WHERE date = date(?)
+      AND user_id = ?
+    '''
+    cur.execute(SQL, (today, user_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    
+    response = make_response(redirect(url_for('bath')))
+    return response
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
@@ -663,10 +733,32 @@ def startup():
   '''
   cur.execute(SQL, (today, ))
   log_f = cur.fetchone()
+  print(f"log = {log_f}")
+
+  # TTLの更新
+  for TTL_count in range(TTL):
+    SQL = '''
+    UPDATE bath
+    SET TTL = ?
+    WHERE date = date(?)
+      AND condition = 1
+      AND TTL = ?
+    '''
+    cur.execute(SQL, (TTL_count, today, TTL_count+1))
+    conn.commit()
+
+  SQL = '''
+  UPDATE bath
+  SET condition = 2
+  WHERE date = date(?)
+    AND condition = 1
+    AND TTL = ?
+  '''
+  cur.execute(SQL, (today, 0))
+  conn.commit()
   cur.close()
   conn.close()
 
-  print(f"log = {log_f}")
 
   # メンテナンス時間を3~4時
   if 3 <= now.hour < 4 and log_f[0] == 0:# その日の一回だけ実行
@@ -674,8 +766,28 @@ def startup():
     cur = conn.cursor()
     cur.execute("INSERT INTO log(date) VALUES(date(?))", (today, ))
     conn.commit()
+
+    # [user_idの取得]
+    SQL = '''
+    SELECT user_id
+    FROM user
+    WHERE permission = 1
+    '''
+    cur.execute(SQL)
+    user_list = cur.fetchall()
+
     cur.close()
     conn.close()
+
+    for user in user_list:
+      conn = sqlite3.connect("./static/database/kakaria.db")
+      cur = conn.cursor()
+      # [bathデータの追加]
+      cur.execute("INSERT INTO bath(date, user_id, condition, TTL) VALUES(date(?), ?, 0, ?)", (today, user[0], TTL))
+      conn.commit()
+      cur.close()
+      conn.close()
+
     # 3週間先のデータの追加
     if today.weekday() == 0:
       # 月曜日の場合
@@ -692,14 +804,6 @@ def startup():
       cur.execute(SQL, (today, today + (datetime.timedelta(days=6))))
       menu_list = cur.fetchall()
 
-      # [user_idの取得]
-      SQL = '''
-      SELECT user_id
-      FROM user
-      WHERE permission = 1
-      '''
-      cur.execute(SQL)
-      user_list = cur.fetchall()
       cur.close()
       conn.close()
       print(menu_list)

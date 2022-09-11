@@ -1,1 +1,17 @@
 {% extends "./base.html" %}
+
+{% block body %}
+  <!-- グラフの表示 -->
+  <!-- 簡易版 -->
+  <p>未入浴:{{people_list[0]}}</p>
+  <p>入浴中:{{people_list[1]}}</p>
+  <p>入浴済み{{people_list[2]}}</p>
+  <!-- ボタン -->
+  {% if bath_switch == 1 %}
+    <form action="/bath" method="post">
+      <input type="submit" name="bath_switch" value="入浴します">
+    </form>
+  {% else %}
+    <p>入浴中又は入浴済み</p>
+  {% endif %}
+{% endblock %}
