@@ -6,26 +6,41 @@ body{
 }
 /* base */
 .header{
-  display: flex;
   flex-direction: column;
   padding: 0.5rem;
   background-color:#F4F5F7;
 }
-.nav1 a , .nav2 a{
+.div1 a , .div2 a{
   text-decoration: none;
   color: black;
 }
 /* ロゴ、ログイン・新規登録の配置 */
-.nav1{
+.div0 , .div1 , .div2{
   display: flex;
   justify-content: space-between;
   padding: 0.5rem;
+}
+@media screen and (max-width:520px){
+  .div0 , .div1 , .div2{
+    padding: 0px;
+  }
+  .div0{
+    display: block;
+    font-size: 15px;
+  }
+  .div2{
+      flex-wrap: wrap;
+  }
+  .div2 div{
+      width: 50%;
+  }
 }
 /* ロゴの設定 */
 .logo{
   font-size: 80px;
   width: 200px;
   height: 50px;
+  padding-bottom: 20px;
   line-height: 60px;
   text-align: center;
   margin-left: 50px;
@@ -33,33 +48,54 @@ body{
   text-shadow: 1px 2px 3px #808080;
   font-weight: bold;
 }
+@media screen and (max-width:520px){
+  .logo{
+    font-size: 45px;
+    margin-left: 10px;
+    padding-bottom: 10px;
+    width: 150px;
+  }
+}
 .logo :hover{
   opacity: 0.7 ;
 }
 /* ログインと新規登録、トップ・寮食予約・寮食感想・お風呂状況の設定 */
-.nav1 ul , .nav2 ul{
-  display: flex;
-  list-style: none;
-  justify-content: center;
-}
-.nav1 li{
+.div1list{
   width: 100px;
   text-align: center;
   font-size: 18px;
   margin-right: 20px;
   line-height: 10px;
+  padding: 20px 0px;
 }
-.nav2 li{
+@media screen and (max-width:520px){
+  .div1list{
+    font-size: 16px;
+    padding: 8px 0px;
+    margin-right: 10px;
+  }
+}
+.div2list{
   width: 300px;
   text-align: center;
   font-size: 20px;
   justify-content: space-around;
 }
-.nav1 li a , .nav2 li a {
+@media screen and (max-width:520px){
+  .div2list{
+    font-size: 18px;
+  }
+}
+.div1list a , .div2list a {
   padding:10px 10px 5px 10px;
   position: relative;
 }
-.nav1 li a::before , .nav2 li a::before{
+@media screen and (max-width:520px){
+  .div1list a , .div2list a {
+    padding: 0px 5px 5px 5px;
+  }
+}
+.div1list a::before , .div2list a::before{
   background: #ff701e;
   content: '';
   width: 100%;
@@ -72,10 +108,11 @@ body{
   transform: scale(0, 1);
   transition: transform .3s;
 }
-.nav1 li a:hover::before , .nav2 li a:hover::before{
+.div1list a:hover::before , .div2list a:hover::before{
   transform-origin: left top;
   transform: scale(1, 1);
 }
+
 
 /* login */
 .elementstyle {

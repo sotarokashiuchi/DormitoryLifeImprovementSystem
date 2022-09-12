@@ -155,8 +155,8 @@ input[type="text"] , input[type="password"]{
 @media screen and ( max-width:960px){
   input[type="text"] , input[type="password"]{
     width: 220px;
-    padding: 3px;
-    font-size: 1px;     
+    padding: 6px;
+    font-size: 100%;     
  }
  .h1size{
   font-size: 30px;
@@ -166,8 +166,8 @@ input[type="text"] , input[type="password"]{
 @media screen and ( max-width:520px){
   input[type="text"] , input[type="password"]{
     width: 180px;
-    padding: 3px;
-    font-size: 1px;     
+    padding: 6px;
+    font-size: 100%;     
  }
  .h1size{
   font-size: 27px;
