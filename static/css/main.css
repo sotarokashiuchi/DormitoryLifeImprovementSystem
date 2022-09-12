@@ -87,11 +87,55 @@ body{
   max-width: 365px;
 }
 
+@media screen and ( max-width:960px){
+  .elementstyle {
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244); 
+    font-family: sans-serif;
+    margin: 50px auto 60px auto;
+    color: rgb(39, 39, 40);
+    max-width: 450px;
+  } 
+}
+ 
+@media screen and ( max-width:520px){
+  .elementstyle {
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244); 
+    font-family: sans-serif;
+    margin: 50px auto 60px auto;
+    color: rgb(39, 39, 40);
+    max-width: 400px;
+  } 
+}
+
 input[type="text"] , input[type="password"]{
   width: 220px;
   padding: 5px;
   font-size: 1px;     
 } 
+
+@media screen and ( max-width:960px){
+  input[type="text"] , input[type="password"]{
+    width: 220px;
+    padding: 3px;
+    font-size: 1px;     
+ }
+ .h1size{
+  font-size: 30px;
+ }
+}
+
+@media screen and ( max-width:520px){
+  input[type="text"] , input[type="password"]{
+    width: 180px;
+    padding: 3px;
+    font-size: 1px;     
+ }
+ .h1size{
+  font-size: 27px;
+ }
+}
 
 input[type="submit"] , form input[type="reset"]{
   padding-top: 3px;
@@ -128,6 +172,14 @@ input[type="submit"] , form input[type="reset"]{
   color: #3562c2;
 } 
 
+@media screen and ( max-width:520px){
+  .regulation {
+    color: rgb(0, 187, 255);
+    padding-right: 3px;
+    padding-left: 15px;
+  }
+
+}
 .elementstyle1{
   font-family: sans-serif;
   margin: 100px auto auto auto;
@@ -138,10 +190,43 @@ input[type="submit"] , form input[type="reset"]{
   border: 1px solid #555; 
 }
 
+@media screen and ( max-width:960px){
+  .elementstyle1{
+    font-family: sans-serif;
+    margin: 100px auto auto auto;
+    height: 300px;
+    width: 318px;
+    color: rgb(39, 39, 40);
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244);
+    margin-top: 30px;
+  }
+}
+
+@media screen and ( max-width:520px){
+  .elementstyle1{
+    font-family: sans-serif;
+    margin: 100px auto auto auto;
+    height: 300px;
+    width: 318px;
+    color: rgb(39, 39, 40);
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244);; 
+  }
+}
+
 .order{
   text-decoration: none;
   color: rgb(0, 187, 255);
   font-size: 17pt;
+}
+
+@media screen and ( max-width:520px){
+  .order{
+    text-decoration: none;
+    color: rgb(0, 187, 255);
+    font-size: 15pt;
+  }
 }
 
 .order1{
@@ -177,7 +262,32 @@ a.order{
  
 .sinup3{
   font-size: 15pt;}
-  
+
+  @media screen and ( max-width:960px){
+    .sinup{
+      padding-top: 100px;
+      text-align: center;
+    }
+    .sinup1{
+      font-size: 34px;
+      padding-bottom: 30px;
+    }
+    .sinup3{
+      font-size: 16px;}
+  }
+
+ @media screen and ( max-width:520px){
+  .sinup{
+    padding-top: 50px;
+    text-align: center;
+  }
+  .sinup1{
+    font-size: 23px;
+    padding-bottom: 30px;
+  }
+  .sinup3{
+    font-size: 13px;}
+}
   
 
 /* week */
@@ -269,3 +379,5 @@ table th,table td{
   display: block;
   margin-top: 60px;
 }
+
+
