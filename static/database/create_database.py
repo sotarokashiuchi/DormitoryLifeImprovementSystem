@@ -233,6 +233,7 @@ cur.execute(
   "CREATE TABLE bath("
     "date DATE,"
     "user_id INTEGER,"
+    "time TIME,"
     "condition INTEGER,"
     "TTL INTEGER,"
     "PRIMARY KEY(date, user_id)"

@@ -525,12 +525,18 @@ def bath():
 
   user_id = authentication_session()[0]
   today = datetime.date.today()
+  now = datetime.datetime.now()
+  time = f"{now.hour:02}:{now.minute:02}:{now.second:02}"
 
   if request.method == "GET":
+    # 定義
     people_list = []
-
+    today_list = []
+    average_list = []
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+
+    # 入浴状況を取得
     SQL='''
     SELECT COUNT(*)
     FROM bath
@@ -542,36 +548,60 @@ def bath():
     bath_switch = cur.fetchone()
     print(f"bath_switch = {bath_switch}")
 
-    SQL='''
-    SELECT COUNT(*)
-    FROM bath
-    WHERE date = date(?)
-      AND condition = 0
-    '''
-    cur.execute(SQL, (today, ))
-    people_list.append(cur.fetchone()[0])
+    # 入浴状況ごとに集計
+    for condition in range(3):
+      SQL='''
+      SELECT COUNT(*)
+      FROM bath
+      WHERE date = date(?)
+        AND condition = ?
+      '''
+      cur.execute(SQL, (today, condition))
+      people_list.append(cur.fetchone()[0])
+    print(f"people_list = {people_list}")
 
-    SQL='''
-    SELECT COUNT(*)
-    FROM bath
-    WHERE date = date(?)
-      AND condition = 1
-    '''
-    cur.execute(SQL, (today, ))
-    people_list.append(cur.fetchone()[0])
+    # 母数を計算
+    cur.execute("SELECT COUNT(*) FROM bath")
+    all_people = people_list[0] + people_list[1] + people_list[2]
+    all_record = cur.fetchone()[0]
 
-    SQL='''
-    SELECT COUNT(*)
-    FROM bath
-    WHERE date = date(?)
-      AND condition = 2
-    '''
-    cur.execute(SQL, (today, ))
-    people_list.append(cur.fetchone()[0])
+    # グラフの作成
+    start_time = datetime.datetime(YEAR, 1, 1, 17, 0, 0, 0)
+    for _ in range(15):
+      # 集計時刻を取得
+      goal_time = start_time +  datetime.timedelta(minutes=19, seconds=59)
+      point_time = f"{start_time.hour:02}:{start_time.minute:02}:{start_time.second:02}"
+      point_stop_time = f"{goal_time.hour:02}:{goal_time.minute:02}:{goal_time.second:02}"
+      print(f"point_time = {point_time}, point_stop_time = {point_stop_time}")
+      
+      # 本日の推移
+      SQL='''
+      SELECT COUNT(*)
+      FROM bath
+      WHERE date = date(?)
+        AND condition <> 0
+        AND time BETWEEN time(?) AND time(?)
+      '''
+      cur.execute(SQL, (today, point_time, point_stop_time))
+      today_list.append((cur.fetchone()[0]) / all_people * 100)
+      
+      # 平均の推移
+      SQL='''
+      SELECT COUNT(*)
+      FROM bath
+      WHERE condition <> 0
+        AND time BETWEEN time(?) AND time(?)
+      '''
+      cur.execute(SQL, (point_time, point_stop_time))
+      average_list.append((cur.fetchone()[0]) / all_record * 100)
+
+      # 更新処理
+      start_time += datetime.timedelta(minutes=20)
+    print(f"today_list = {today_list}")
 
     cur.close()
     conn.close()
-    response = make_response(render_template("./bath.html", bath_switch=bath_switch[0], people_list=people_list))
+    response = make_response(render_template("./bath.html", bath_switch=bath_switch[0], people_list=people_list, today_list=today_list, average_list=average_list))
     return response
   else:
     bath_switch = request.form["bath_switch"]
@@ -580,11 +610,13 @@ def bath():
     cur = conn.cursor()
     SQL='''
     UPDATE bath
-    SET condition = 1
+    SET condition = 1,
+        time = time(?)
     WHERE date = date(?)
       AND user_id = ?
     '''
-    cur.execute(SQL, (today, user_id))
+    print(f"time = {time}")
+    cur.execute(SQL, (time, today, user_id))
     conn.commit()
     cur.close()
     conn.close()
