@@ -9,8 +9,8 @@
   <h2>本日の推移</h2>
   <div class="graph">
     <div class="graph-main">
-      {% for percent in today_list %}
-        <div class="bar" style="height: {{percent}}%;"></div>
+      {% for percent, color in today_list %}
+        <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
       {% endfor %}
     </div>
     <div class="graph-axis-padding">
@@ -32,8 +32,8 @@
   <h2>平日の平均の推移</h2>
   <div class="graph">
     <div class="graph-main">
-      {% for percent in average_list %}
-        <div class="bar" style="height: {{percent}}%;"></div>
+      {% for percent, color in average_list %}
+        <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
       {% endfor %}
     </div>
     <div class="graph-axis-padding">

@@ -3,8 +3,9 @@
   display: flex;
   align-items: flex-end;
   height: 200px;
-  max-width: 300px;
+  max-width: 303px;
   margin: 0 auto;
+  border-left: 3px solid rgb(218,220,224);
 }
 
 /* 棒 */
@@ -12,7 +13,7 @@
   width: 19px;
   margin: 0 0.5px;
   
-  background: rgb(26,115,232);
+  /* background: rgb(26,115,232); */
   /* 丸角 */
   border-radius: 4px 4px 0 0;
 }
@@ -53,64 +54,3 @@
 .graph-axis .axis21{
   margin-right: 30px;
 }
-
-/* 棒詳細 */
-/* .graph-main .bar01 {
-  height: 22%;
-}
-
-.graph-main .bar02 {
-  height: 35%;
-}
-
-.graph-main .bar03 {
-  height: 54%;
-}
-
-.graph-main .bar04 {
-  height: 2%;
-}
-
-.graph-main .bar05 {
-  height: 5%;
-}
-
-.graph-main .bar06 {
-  height: 4%;
-}
-
-.graph-main .bar07 {
-  height: 98%;
-}
-
-.graph-main .bar08 {
-  height: 34%;
-}
-
-.graph-main .bar09 {
-  height: 23%;
-}
-
-.graph-main .bar10 {
-  height: 14%;
-}
-
-.graph-main .bar11 {
-  height: 65%;
-}
-
-.graph-main .bar12 {
-  height: 53%;
-}
-
-.graph-main .bar13 {
-  height: 12%;
-}
-
-.graph-main .bar14 {
-  height: 65%;
-}
-
-.graph-main .bar15 {
-  height: 34%;
-} */

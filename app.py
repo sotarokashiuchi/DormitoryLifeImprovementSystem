@@ -10,6 +10,7 @@ import datetime
 # グローバル変数
 YEAR = 2022
 UPDATE = 2
+BATH_MAX = 20
 TTL = 5
 
 
@@ -561,9 +562,16 @@ def bath():
     print(f"people_list = {people_list}")
 
     # 母数を計算
-    cur.execute("SELECT COUNT(*) FROM bath")
-    all_people = people_list[0] + people_list[1] + people_list[2]
-    all_record = cur.fetchone()[0]
+    SQL = '''
+      SELECT COUNT(*)
+      FROM (
+        SELECT DISTINCT date
+        FROM bath
+      )
+    '''
+    cur.execute(SQL)
+    all_date = cur.fetchone()[0]
+    print(all_date)
 
     # グラフの作成
     start_time = datetime.datetime(YEAR, 1, 1, 17, 0, 0, 0)
@@ -583,7 +591,19 @@ def bath():
         AND time BETWEEN time(?) AND time(?)
       '''
       cur.execute(SQL, (today, point_time, point_stop_time))
-      today_list.append((cur.fetchone()[0]) / all_people * 100)
+      percent = ((cur.fetchone()[0]) / BATH_MAX * 100)
+      color = None
+      if percent < 80:
+        # 青
+        color = "rgb(26,115,232)"
+      elif 80 <= percent < 100:
+        # 黄
+        color = "rgb(255,209,0)"
+      elif 100 <= percent:
+        # 赤
+        color = "rgb(255,39,1)"
+        percent = 100
+      today_list.append((percent, color))
       
       # 平均の推移
       SQL='''
@@ -593,7 +613,19 @@ def bath():
         AND time BETWEEN time(?) AND time(?)
       '''
       cur.execute(SQL, (point_time, point_stop_time))
-      average_list.append((cur.fetchone()[0]) / all_record * 100)
+      percent = (cur.fetchone()[0]) / all_date / BATH_MAX * 100
+      color = None
+      if percent < 80:
+        # 青
+        color = "rgb(26,115,232)"
+      elif 80 <= percent < 100:
+        # 黄
+        color = "rgb(255,209,0)"
+      elif 100 <= percent:
+        # 赤
+        color = "rgb(255,39,1)"
+        percent = 100
+      average_list.append((percent, color))
 
       # 更新処理
       start_time += datetime.timedelta(minutes=20)
