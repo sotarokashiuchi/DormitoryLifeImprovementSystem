@@ -2,7 +2,6 @@
 import calendar
 import hashlib
 import random
-from traceback import print_tb
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 import sqlite3
 import datetime
