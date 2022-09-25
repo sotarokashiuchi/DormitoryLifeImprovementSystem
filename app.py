@@ -12,7 +12,6 @@ UPDATE = 2
 BATH_MAX = 20
 TTL = 5
 
-
 # flaskクラスのインスタンスを作成
 app = Flask(__name__)
 
@@ -33,10 +32,11 @@ def index():
   else:
     # セッション認証完了
     user_id = authentication_session()[0]
-    # SQL操作 [メニューの取得]
     today = datetime.date.today()
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+    
+    # SQL メニューの取得
     SQL='''
     SELECT times.time_str, sets.set_str, food.food_name
     FROM reservation 
@@ -80,11 +80,11 @@ def week():
 
   if request.method == "GET":
     # GET
-    # SQL操作
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+    
     # [メニューの取得]
     SQL = '''
     SELECT menu.menu_id, sets.set_str, menu.date, times.time_str, food.food_name
