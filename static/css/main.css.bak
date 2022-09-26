@@ -275,17 +275,15 @@ header{
 
 input[type="text"] , input[type="password"]{
   width: 220px;
-  height: 19px;
-  font-size: 80%;     
+  padding: 5px;
+  font-size: 1px;     
 } 
 
 @media screen and ( max-width:960px){
   input[type="text"] , input[type="password"]{
-    padding-top: 0px;
-    padding-bottom: 0px;   
-    height: 25px;
-    width: 280px;
-    font-size: 100%; 
+    width: 220px;
+    padding: 6px;
+    font-size: 100%;     
  }
  .h1size{
   font-size: 30px;
@@ -297,8 +295,7 @@ input[type="text"] , input[type="password"]{
     padding-top: 0px;
     padding-bottom: 0px;
     height: 23px;
-    font-size: 100%;  
-    width: 220px;   
+    font-size: 100%;     
  }
  .h1size{
   font-size: 27px;
@@ -363,11 +360,11 @@ input[type="submit"] , form input[type="reset"]{
     font-family: sans-serif;
     margin: 100px auto auto auto;
     height: 300px;
-    width: 420px;
+    width: 318px;
     color: rgb(39, 39, 40);
     background-color: rgb(244, 244, 244);
     border: 1px solid rgb(244, 244, 244);
-    margin-top: 100px;
+    margin-top: 30px;
   }
 }
 
@@ -484,6 +481,9 @@ table{
 table th,table td{
   border:1px #999 solid; /* 枠線をつける */
 }
+table td{
+  text-align: left;
+}
 
 
 /* ラジオボタンの設定（装飾とか） */
@@ -537,38 +537,3 @@ table th,table td{
   background-color: #4abdac;
   border-radius: 40px;
 }
-
-/* control-input */
-#explanation{
-  margin-top: 40px;
-  margin-bottom: 60px;
-}
-#result{
-  display: block;
-  margin-top: 60px;
-}
-
-.monthday{
-  width: 150px;
-}
- 
-.monthA{
-  width: 300px;
-  height: 32px;
-  border-bottom:#F4F5F7 ;
-}
-
-.monthB{
-  height: 32px;
-  border-top: #F4F5F7;
-}
-
-.month1{
-  width: 190px;
-  border-bottom:#F4F5F7 ;
-}
-
-.month2{
-  border-top: #F4F5F7;
-}
-
