@@ -306,8 +306,9 @@ input[type="text"] , input[type="password"]{
 }
 
 input[type="submit"] , form input[type="reset"]{
-  padding-top: 3px;
-  padding-bottom: 3px;
+  /* padding-top: 3px;
+  padding-bottom: 3px; */
+  height: 28px;
   margin-bottom: 20px;
   margin-top: 45px;
   width: 220px;
@@ -321,6 +322,18 @@ input[type="submit"] , form input[type="reset"]{
   text-decoration: none; /* 文字の下線を消す */
 } 
 
+@media screen and ( max-width:960px){
+  input[type="submit"] , form input[type="reset"]{
+    height: 30px;
+    width: 264px;
+  }
+}
+
+@media screen and ( max-width:520px){
+  input[type="submit"] , form input[type="reset"]{
+    width: 225px;
+  }
+}
 .miss{
   color: red;
 }
