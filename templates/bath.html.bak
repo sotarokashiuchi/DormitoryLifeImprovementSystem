@@ -1,0 +1,67 @@
+{% extends "./base.html" %}
+
+{% block head %}
+  <link rel="stylesheet" href="/static/css/graph.css">
+{% endblock %}
+
+{% block body %}
+  <!-- グラフの表示 -->
+  <h2>本日の推移</h2>
+  <div class="graph">
+    <div class="graph-main">
+      {% for percent, color in today_list %}
+        <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
+      {% endfor %}
+    </div>
+    <div class="graph-axis-padding">
+      <div class="padding"></div>
+      <div class="padding"></div>
+      <div class="padding"></div>
+      <div class="padding"></div>
+      <div class="padding"></div>
+    </div>
+    <div class="graph-axis">
+      <div class="axis axis18">18</div>
+      <div class="axis axis19">19</div>
+      <div class="axis axis20">20</div>
+      <div class="axis axis21">21</div>
+    </div>
+  </div>
+
+  <!-- 平均のグラフ -->
+  <h2>平日の平均の推移</h2>
+  <div class="graph">
+    <div class="graph-main">
+      {% for percent, color in average_list %}
+        <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
+      {% endfor %}
+    </div>
+    <div class="graph-axis-padding">
+      <div class="padding"></div>
+      <div class="padding"></div>
+      <div class="padding"></div>
+      <div class="padding"></div>
+      <div class="padding"></div>
+    </div>
+    <div class="graph-axis">
+      <div class="axis axis18">18</div>
+      <div class="axis axis19">19</div>
+      <div class="axis axis20">20</div>
+      <div class="axis axis21">21</div>
+    </div>
+  </div>
+
+  <!-- 簡易版 -->
+  <p>未入浴:{{people_list[0]}}</p>
+  <p>入浴中:{{people_list[1]}}</p>
+  <p>入浴済み{{people_list[2]}}</p>
+
+  <!-- ボタン -->
+  {% if bath_switch == 1 %}
+    <form action="/bath" method="post">
+      <input type="submit" name="bath_switch" value="入浴します">
+    </form>
+  {% else %}
+    <p>入浴中又は入浴済み</p>
+  {% endif %}
+{% endblock %}
