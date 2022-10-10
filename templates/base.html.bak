@@ -8,14 +8,11 @@
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <header>
-  <div class="topmenu">
-    <div id="logo"><a href="/">kakaria</a></div>
-    <ul class="topmenu1">
-      <li id="login"><a href="/login">ログイン</a></li>
-      <li id="sinup"><a href="/sinup">新規登録</a></li>
-    </ul>  
-  </div>
-  
+  <div id="logo"><a href="/">kakaria</a></div>
+  <ul class="topmenu1">
+    <li id="login"><a href="/login">ログイン</a></li>
+    <li id="sinup"><a href="/sinup">新規登録</a></li>
+  </ul>
   <div id="accordion-menu">
     <!-- チェックボックス -->
     <input type="checkbox" id="open">

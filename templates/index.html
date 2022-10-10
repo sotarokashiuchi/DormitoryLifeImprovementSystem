@@ -11,49 +11,55 @@
     <p>{{time}} : 『{{set}}セットの{{food_name}}』を受け取りましょう。</p>
   {% endfor %}
 
-  <!-- グラフの表示 -->
-  <h2>本日の推移</h2>
-  <div class="graph">
-    <div class="graph-main">
-      {% for percent, color in today_list %}
-        <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
-      {% endfor %}
-    </div>
-    <div class="graph-axis-padding">
-      <div class="padding"></div>
-      <div class="padding"></div>
-      <div class="padding"></div>
-      <div class="padding"></div>
-      <div class="padding"></div>
-    </div>
-    <div class="graph-axis">
-      <div class="axis axis18">18</div>
-      <div class="axis axis19">19</div>
-      <div class="axis axis20">20</div>
-      <div class="axis axis21">21</div>
-    </div>
-  </div>
-
-  <!-- 平均のグラフ -->
-  <h2>平日の平均の推移</h2>
-  <div class="graph">
-    <div class="graph-main">
-      {% for percent, color in average_list %}
-        <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
-      {% endfor %}
-    </div>
-    <div class="graph-axis-padding">
-      <div class="padding"></div>
-      <div class="padding"></div>
-      <div class="padding"></div>
-      <div class="padding"></div>
-      <div class="padding"></div>
-    </div>
-    <div class="graph-axis">
-      <div class="axis axis18">18</div>
-      <div class="axis axis19">19</div>
-      <div class="axis axis20">20</div>
-      <div class="axis axis21">21</div>
-    </div>
-  </div>
+    <!-- グラフの表示 -->
+    <div class="graph-wrap">
+      <div class="graph-wrap-graph">
+        <div class="graph-wrap-today">
+          <h2>本日の推移</h2>
+          <div class="graph">
+            <div class="graph-main">
+              {% for percent, color in today_list %}
+                <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
+              {% endfor %}
+            </div>
+            <div class="graph-axis-padding">
+              <div class="padding"></div>
+              <div class="padding"></div>
+              <div class="padding"></div>
+              <div class="padding"></div>
+              <div class="padding"></div>
+            </div>
+            <div class="graph-axis">
+              <div class="axis axis18">18</div>
+              <div class="axis axis19">19</div>
+              <div class="axis axis20">20</div>
+              <div class="axis axis21">21</div>
+            </div>
+          </div>
+        </div>
+        <!-- 平均のグラフ -->
+        <div class="graph-wrap-average">
+          <h2>平日の平均の推移</h2>
+          <div class="graph">
+            <div class="graph-main">
+              {% for percent, color in average_list %}
+                <div class="bar" style="height: {{percent}}%; background: {{color}};"></div>
+              {% endfor %}
+            </div>
+            <div class="graph-axis-padding">
+              <div class="padding"></div>
+              <div class="padding"></div>
+              <div class="padding"></div>
+              <div class="padding"></div>
+              <div class="padding"></div>
+            </div>
+            <div class="graph-axis">
+              <div class="axis axis18">18</div>
+              <div class="axis axis19">19</div>
+              <div class="axis axis20">20</div>
+              <div class="axis axis21">21</div>
+            </div>
+          </div>
+        </div>
+      </div>
 {% endblock %}
