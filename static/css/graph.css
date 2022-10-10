@@ -89,6 +89,9 @@
   display: none;
 }
 @media screen and (max-width:660px){
+  .graph{
+    padding: 0;
+  }
   .graph-wrap-graph{
     flex-direction: column;
   }
