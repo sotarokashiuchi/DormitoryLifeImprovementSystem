@@ -7,13 +7,9 @@
 {% block body %}
   <form action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSe5hHyyo0T5EvXxh3NINtYYfzui-DFzY72PN7fBgI5X7XvYSQ/formResponse" method="post">
     <label>
-      <h1>寮食感想</h1>
-      
-      <textarea type="text" name="entry.1779410853" class="feeling" placeholder="寮食に対する感想を記入してください。"></textarea>
+      寮食に対する感想又はコメントを記入してください。
+      <input type="text" name="entry.1779410853">
     </label>
-    <div>
-      <input type="submit" value="送信">
-    </div>
- </form>
- 
+    <input type="submit" value="送信">
+  </form>
 {% endblock %}

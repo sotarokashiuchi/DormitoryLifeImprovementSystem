@@ -7,8 +7,11 @@ import sqlite3
 import datetime
 
 # グローバル変数
+# 現在の西暦を指定
 YEAR = 2022
+# 寮食予約システム 予約受付終了時間(日)
 UPDATE = 2
+# お風呂の入浴時間(分)
 BATH_MAX = 20
 TTL = 5
 
@@ -16,6 +19,7 @@ TTL = 5
 app = Flask(__name__)
 
 # routeデコレータを使用し、どのURLが関数の引き金になるべきかをFlaskに伝える
+# トップページ
 @app.route('/')
 def index():
   ##レスポンスデータ
@@ -36,7 +40,7 @@ def index():
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
     
-    # SQL メニューの取得
+    # [本日の予約済みメニューを取得]
     SQL='''
     SELECT times.time_str, sets.set_str, food.food_name
     FROM reservation 
@@ -55,6 +59,7 @@ def index():
     response = make_response(render_template("./index.html", order_list=order_list, today=str(today)))
     return response
 
+# 寮食予約システム > トップ
 @app.route('/ryosyoku_order')
 def ryosyoku_order():
   if (authentication_session())[0] != -1:
@@ -65,6 +70,7 @@ def ryosyoku_order():
     # セッション認証非完了
     return redirect(url_for('login'))
 
+# 寮食予約システム > 入力ページ
 @app.route('/ryosyoku_order/week', methods=["POST", "GET"])
 def week():
   if (authentication_session())[0] == -1:
@@ -73,6 +79,7 @@ def week():
   # セッション認証完了
   user_id = (authentication_session())[0]
   
+  # クエリストリング取得
   key = request.args.get("key")
   if key != '1' and key != '2':
     # week1,2以外にアクセス
@@ -85,7 +92,7 @@ def week():
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
     
-    # [メニューの取得]
+    # [該当メニューの取得]
     SQL = '''
     SELECT menu.menu_id, sets.set_str, menu.date, times.time_str, food.food_name
     FROM menu 
@@ -107,7 +114,7 @@ def week():
 
     menu_answer_list = []
     for menu in menu_list:
-      # 予約状況の取得
+      # [入力済みの予約状況の取得]
       SQL = '''
       SELECT COUNT(*)
       FROM reservation
@@ -125,6 +132,8 @@ def week():
         '''
         cur.execute(SQL, (menu[0], user_id, menu[1]))
         answer = cur.fetchone()
+        
+        # フォーマットに整える
         if answer != None:
           menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
         else:
@@ -144,11 +153,8 @@ def week():
     monday = today - datetime.timedelta(days=today.weekday())
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
-    # SQL = '''
-    # SELECT DISTINCT menu.menu_id 
-    # FROM menu 
-    # WHERE date BETWEEN date(?) AND date(?)
-    # '''
+    
+    # [該当メニューの取得]
     SQL = '''
       SELECT DISTINCT menu_id
       FROM reservation
@@ -322,7 +328,8 @@ def week():
       cur.close()
       conn.close()
     return redirect(url_for('order_complete'))
-  
+
+# 寮食予約システム > 入力完了ページ
 @app.route('/ryosyoku_order/order_complete')
 def order_complete():
   if (authentication_session())[0] == -1:
@@ -331,6 +338,7 @@ def order_complete():
   response = make_response(render_template("./order_complete.html"))
   return response
 
+# 寮食予約システム > 管理者ページ > 入力結果
 @app.route('/ryosyoku_order/control/result', methods=["POST", "GET"])
 def control_result():
   if (authentication_session())[1] == 2:
@@ -358,7 +366,7 @@ def control_result():
   else:
     return redirect(url_for('login'))
 
-
+# 寮食予約システム > 管理者 > 献立トップページ
 @app.route('/ryosyoku_order/control/input', methods=["POST", "GET"])
 def control_input():
   if (authentication_session())[1] == 2:
@@ -368,6 +376,7 @@ def control_input():
   else:
     return redirect(url_for('login'))
 
+# 寮食予約システム > 管理者 > 献立入力ページ
 @app.route('/ryosyoku_order/control/input/month', methods=["POST", "GET"])
 def month():
   if (authentication_session())[1] != 2:
@@ -511,11 +520,13 @@ def month():
       old_time = time_id
     return redirect(url_for('control_input'))
 
+# 寮食感想入力ページ
 @app.route('/ryosyoku_feeling')
 def ryosyoku_feeling():
   response = make_response(render_template("./ryosyoku_feeling.html"))
   return response
 
+# お風呂混雑状況システム
 @app.route('/bath', methods=["GET", "POST"])
 def bath():
   if (authentication_session())[1] == -1:
@@ -655,6 +666,7 @@ def bath():
     response = make_response(redirect(url_for('bath')))
     return response
 
+# ログインページ
 @app.route('/login', methods=["POST", "GET"])
 def login():
   if request.method == "GET":
@@ -696,6 +708,7 @@ def login():
       response.set_cookie("SESSID", value=sesssid, expires=expires)
       return response
 
+# サインインページ
 @app.route('/sinup', methods=["POST", "GET"])
 def sinup():
   if request.method == "GET":
@@ -731,6 +744,7 @@ def sinup():
       # 新規会員登録完了
       return redirect(url_for('sinup_complete'))
 
+# パスワード変更ページ
 @app.route('/change_password', methods=["POST", "GET"])
 def change_password():
   if request.method == "GET":
@@ -766,6 +780,7 @@ def change_password():
       conn.close()
       return redirect(url_for('index'))
 
+# 新規登録完了ページ
 @app.route('/sinup_complete')
 def sinup_complete():
   response = make_response(render_template("./sinup_complete.html"))
@@ -780,6 +795,7 @@ def password_hash(password):
   print(f"\treturn {password_sh=}")
   return password_sh
 
+# バッチ処理
 # @app.route('/startup', methods=["HEAD"])
 @app.route('/startup')
 def startup():
