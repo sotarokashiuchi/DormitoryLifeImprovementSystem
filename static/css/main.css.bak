@@ -18,6 +18,11 @@ header{
   padding: 0.5rem;
   background-color:#F4F5F7;
 }
+.topmenu{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 .topmenu1{
   justify-content: space-between;
   list-style: none;
@@ -26,7 +31,6 @@ header{
 }
 #logo{
   font-size: 80px;
-  /* width: 600px; */
   height: 50px;
   line-height: 30px;
   margin-left: 80px;
@@ -39,7 +43,6 @@ header{
 }
 #logo :hover{
   opacity: 0.7 ;
-  /* transition: .5s ; */
 }
 /* ログインと新規登録、トップ・寮食予約・寮食感想・お風呂状況の設定 */
 .topmenu2{
@@ -55,7 +58,9 @@ header{
   line-height: 20px;
   display: inline-block;
   position: relative;
-  bottom: 40px;
+}
+#accordion-menu{
+  margin-top: 16px;
 }
 .topmenu2 li{
   width: 300px;
@@ -87,33 +92,18 @@ header{
 #open{
   display: none;
 }
-.selectmonth ul{
-  display: flex;
-  list-style: none;
-  justify-content: center;
-}
-.selectmonth li{
-  width: 300px;
-  text-align: center;
-  font-size: 20px;
-  justify-content: space-around;
-}
-#result{
-  font-size: 18px;
-}
-#phone{
-  display: none;
-}
+
 @media screen and (max-width:1100px){
   #logo{
     margin-left: 20px;
   }
 }
 @media screen and (max-width:520px){
+  header{
+    flex-direction: row;
+  }
   #logo{
     font-size: 40px;
-    margin-left: 0px;
-    top: 30px;
   }
   #logo :hover{
     opacity: 1.0 ;
@@ -123,27 +113,33 @@ header{
     transition: .2s;
   }
   .topmenu1{
-    margin: 16px 0px 0px 0px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 0px;
   }
   .topmenu1 li{
-    display: block;
-    position: relative;
-    bottom: 50px;
-    left: 35%;
-    margin: 10px;
+    margin: 3px;
   }
   .topmenu1 li a{
     padding: 0px;
-    position: relative;
+  }
+  .topmenu2{
+    display: block;
+  }
+  .topmenu2 li{
+    margin: 10px;
+    border-bottom: 1px rgba(255,255,255,1) solid;
+    width: 200px;
   }
   #top{
-    padding: 10px 120px 0px 120px;
+    padding: 10px 70px 0px 70px;
   }
   #order , #feeling{
-    padding: 10px 110px 0px 110px;
+    padding: 10px 60px 0px 60px;
   }
   #bath{
-    padding: 10px 80px 0px 80px;
+    padding: 10px 30px 0px 30px;
   }
   .topmenu1 li a::before , .topmenu2 li a::before{
     display: none;
@@ -153,14 +149,6 @@ header{
   }
   .topmenu1 li a:active , .topmenu2 li a:active{
     background-color: #808080;
-  }
-  .topmenu2{
-    display: block;
-  }
-  .topmenu2 li{
-    margin: 10px;
-    border-bottom: 1px rgba(255,255,255,1) solid;
-    text-align: left;
   }
   /*** ボタン全体 ***/
   .menu-btn{
@@ -173,9 +161,10 @@ header{
   }
   /*** ボタンの三本線（共通） ***/
   #accordion-menu{
+    margin-top: 0px;
     position: fixed;
     left: 75%;
-    top: 3px;
+    top: -7px;
   }
   .menu-btn span{
     position: absolute;
@@ -218,7 +207,7 @@ header{
     width: 100vw; /*全画面*/
     height: 100vh;
     box-sizing: border-box;
-    padding: 80px 60px; /*ボタンと被らない位には*/
+    padding: 80px 60px 0px 80px; /*ボタンと被らない位には*/
     background: rgb(188, 188, 188); /*背景*/
     opacity: 0; /*透明*/
     visibility: hidden; /*標準で非表示*/
@@ -231,12 +220,6 @@ header{
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
-  }
-  .selectmonth , #explanation{
-    display: none;
-  }
-  #phone{
-    display: block;
   }
 }
 
@@ -437,12 +420,12 @@ a.order{
 }
  
 .sinup1{
-  font-size: 33pt;
+  font-size: 25pt;
   padding-bottom: 60px;
 }
  
 .sinup3{
-  font-size: 15pt;}
+  font-size: 13pt;}
 
   @media screen and ( max-width:960px){
     .sinup{
@@ -583,5 +566,83 @@ table th,table td{
 
 .month2{
   border-top: #F4F5F7;
+}
+
+.selectmonth ul{
+  display: flex;
+  list-style: none;
+  justify-content: center;
+}
+.selectmonth li{
+  width: 300px;
+  text-align: center;
+  font-size: 20px;
+  justify-content: space-around;
+}
+
+#result{
+  font-size: 18px;
+}
+#phone{
+  display: none;
+}
+@media screen and (max-width:520px){
+  .selectmonth , #explanation{
+    display: none;
+  }
+  #phone{
+    display: block;
+  }
+}
+
+.ordercom{
+  margin-top: 100px;
+  margin-bottom: 45px;
+} 
+
+.ordercom1:hover{
+  color: #3562c2;
+}
+
+.ordercom2{
+  font-size: 14pt;
+}
+
+.ordercom3{
+ margin-bottom: 40px;
+}
+
+@media screen and ( max-width:520px){
+  .ordercom{  
+     font-size: 23px
+  }  
+
+  .ordercom2{
+    font-size: 10pt;
+  }
+}
+
+.feeling{
+  resize: none;
+  width:600px;
+  height:250px;
+  font-size: 16pt;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+@media screen and ( max-width:520px){
+  .feeling{ 
+    resize: none;
+    width: 341px;
+    height: 250px;
+    font-size: 14pt;
+    padding-top: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+ }
 }
 
