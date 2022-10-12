@@ -444,6 +444,7 @@ def month():
     return response
   else:
     # POST
+    # change 一度入力してしまうと、空白の状態にできない。
     menu_list = []
     times = ['朝', '昼', '夜']
     sets = ['A', 'B']
@@ -471,6 +472,7 @@ def month():
     # SQL操作 [menu_idの最大値を取得]
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+    ##### error
     cur.execute("SELECT MAX(menu_id) FROM menu")
     max_menu_id = int(cur.fetchone()[0])
     cur.close()
