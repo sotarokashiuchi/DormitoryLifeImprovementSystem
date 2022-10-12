@@ -13,7 +13,7 @@
           <p>{{month}}月{{day}}日({{week}})({{time}})</p>
         </td>
         <td class="monthA">
-          A:<input type="text" name="{{month}}:{{day}}:{{time}}:A:name" value="{{text_value[0]}}" class="monthC">
+          A:<input type="text" name="{{month}}:{{day}}:{{time}}:A:name" value="{{text_value[0]}}" >
         </td>
         
         <td class="month1">
@@ -21,7 +21,7 @@
         </td> 
           <tr>
              <td class="monthB">
-              B:<input type="text" name="{{month}}:{{day}}:{{time}}:B:name" value="{{text_value[1]}}" class="monthC"> 
+              B:<input type="text" name="{{month}}:{{day}}:{{time}}:B:name" value="{{text_value[1]}}"> 
             </td>
             
             <td class="month2">

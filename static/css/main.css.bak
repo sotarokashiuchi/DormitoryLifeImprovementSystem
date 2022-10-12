@@ -233,8 +233,8 @@ header{
 
 @media screen and ( max-width:960px){
   .elementstyle {
-    background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247); 
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244); 
     font-family: sans-serif;
     margin: 50px auto 60px auto;
     color: rgb(39, 39, 40);
@@ -244,8 +244,8 @@ header{
  
 @media screen and ( max-width:520px){
   .elementstyle {
-    background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247); 
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244); 
     font-family: sans-serif;
     margin: 50px auto 60px auto;
     color: rgb(39, 39, 40);
@@ -358,8 +358,8 @@ input[type="submit"] , form input[type="reset"]{
     height: 300px;
     width: 420px;
     color: rgb(39, 39, 40);
-    background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247);
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244);
     margin-top: 100px;
   }
 }
@@ -371,8 +371,8 @@ input[type="submit"] , form input[type="reset"]{
     height: 300px;
     width: 318px;
     color: rgb(39, 39, 40);
-    background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247);
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(244, 244, 244);; 
   }
 }
 
@@ -643,10 +643,3 @@ table th,table td{
  }
 }
 
-@media screen and ( max-width:960px){
-input.monthC{
-  width: 200px;
-  height: 22px;
-  font-size: 90%;     
-}
-}

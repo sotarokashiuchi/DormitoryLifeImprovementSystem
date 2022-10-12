@@ -126,9 +126,9 @@ cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id'
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('24', '0', '2022-10-12', '2', '27', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('24', '1', '2022-10-12', '2', '28', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('25', '0', '2022-10-13', '0', '2', '0')")
-# cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('25', '1', '2022-10-13', '0', '3', '0')")
+cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('25', '1', '2022-10-13', '0', '3', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('26', '0', '2022-10-13', '1', '29', '0')")
-# cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('26', '1', '2022-10-13', '1', '30', '0')")
+cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('26', '1', '2022-10-13', '1', '30', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('27', '0', '2022-10-13', '2', '31', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('27', '1', '2022-10-13', '2', '32', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('28', '0', '2022-10-14', '0', '2', '0')")
@@ -254,3 +254,14 @@ if True:
       cur.close()
       conn.close()
 
+# conn = sqlite3.connect("./static/database/kakaria.db")
+# cur = conn.cursor()
+# # [入力確定のみ更新]
+# SQL = '''
+#   UPDATE reservation
+#   SET 
+# '''
+# cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (menu, user[0], set))
+# conn.commit()
+# cur.close()
+# conn.close()
