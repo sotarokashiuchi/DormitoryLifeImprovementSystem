@@ -2,7 +2,7 @@
 
 {% block body %}
   <!-- ↓何月何日～何月何日までの予約なのかを表示させてほしいです -->
-  <h1>A月B日～C月D日</h1>
+  <h1>{{start_day[0]}}月{{start_day[1]}}日～{{end_day[0]}}月{{end_day[1]}}日</h1>
   <form action="/ryosyoku_order/week?key={{key}}" method="post">
     <table>
       <tr>

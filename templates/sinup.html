@@ -9,6 +9,10 @@
     <p>パスワード</p>
     <input type="text" name="password">
     <input type="submit">
+    {% if condition == 1 %}
+      <!-- 入力ミスの場合 --> 
+      <p class="miss">そのユーザ名はすでに使用されています。<br>別のユーザ名をご使用ください。</p>
+    {% endif %}
   </form>
   <br>
   <a href="login" class="regulation">ログインシステム</a>

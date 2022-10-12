@@ -89,6 +89,9 @@ def week():
     # GET
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
+    start_day = [monday.month, monday.day]
+    end_day = [(monday + (datetime.timedelta(days=6))).month, (monday + (datetime.timedelta(days=6))).day]
+    print(start_day)
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
     
@@ -144,7 +147,7 @@ def week():
     cur.close()
     conn.close()
     print(f"menu_anserw_list={menu_answer_list}")
-    response = make_response(render_template("./week.html", menu_answer_list=menu_answer_list, key=key))
+    response = make_response(render_template("./week.html", menu_answer_list=menu_answer_list, key=key, start_day=start_day, end_day=end_day))
     return response
   else:
     # POST
@@ -731,7 +734,7 @@ def sinup():
     conn.close()
     if fetch_user != None:
       # すでに同じユーザ名が登録されている場合
-      response = make_response(render_template("./login.html", condition=1))
+      response = make_response(render_template("./sinup.html", condition=1))
       return response
     else:
       # パスワードのハッシュ化
