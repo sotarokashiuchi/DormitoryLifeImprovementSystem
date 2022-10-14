@@ -105,15 +105,10 @@
   }
 
   .hidden_graph label {
-    padding: 15px;
-    width: 220px;
-    font-size: 13px;
-    border: 1px solid;
-    display: inline-block;
-    background-color: #a4fff2;
-    border-color: white;
-    color: white;
-    cursor: pointer;
+      padding: 15px;
+      font-weight: bold;
+      border: solid 2px black;
+      cursor :pointer;
   }
 
   .hidden_graph input {

@@ -473,6 +473,7 @@ table{
   border-collapse: collapse;  /* th、tdなどの隣接するセルの枠線を重ねて表示する */
   margin-right: auto;
   margin-left: auto;
+  text-align: left;
 }
 table th,table td{
   border:1px #999 solid; /* 枠線をつける */
@@ -534,11 +535,10 @@ table th,table td{
 /* control-input */
 #explanation{
   margin-top: 40px;
-  margin-bottom: 60px;
 }
 #result{
   display: block;
-  margin-top: 60px;
+  margin-top: 30px;
 }
 
 .monthday{

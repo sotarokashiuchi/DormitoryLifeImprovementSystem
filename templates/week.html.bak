@@ -39,6 +39,7 @@
     </table>
     <br>
     <div class="botton">
+      <input type="reset" value="リセット">
       <input type="submit">
     </div>
   </form>
