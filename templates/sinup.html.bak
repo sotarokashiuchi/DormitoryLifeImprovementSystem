@@ -7,7 +7,7 @@
     <p>ユーザ名</p>
     <input type="text" name="user_name">
     <p>パスワード</p>
-    <input type="password" name="password">
+    <input type="text" name="password">
     <input type="submit" value="送信">
     {% if condition == 1 %}
       <!-- 入力ミスの場合 --> 
