@@ -2,6 +2,7 @@
 import calendar
 import hashlib
 import random
+from traceback import print_tb
 from flask import Flask, make_response, redirect, render_template, request, session, url_for
 import sqlite3
 import datetime
@@ -10,7 +11,7 @@ import datetime
 # 現在の西暦を指定
 YEAR = 2022
 # 寮食予約システム 予約受付終了時間(日)
-UPDATE = 2
+UPDATE = 3
 # お風呂の入浴時間(分)
 BATH_MAX = 20
 TTL = 5
@@ -30,53 +31,52 @@ def index():
   # 引数のテンプレートファイル内の文字列の置き換えなどを行った後の文字列を返す
   # return render_template("index.html")
 
-  if (authentication_session())[0] == -1:
-    # セッション認証非完了
-    return redirect(url_for('login'))
-  else:
-    # セッション認証完了
-    user_id = authentication_session()[0]
-    today = datetime.date.today()
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
+  # セッション認証
+  if authentication_redirect() != None:
+    # 認証拒否
+    return authentication_redirect()
     
-    # [本日の予約済みメニューを取得]
-    SQL='''
-    SELECT times.time_str, sets.set_str, food.food_name
-    FROM reservation 
-      INNER JOIN menu ON reservation.menu_id = menu.menu_id
-                    AND  reservation.answer = menu.sets_id
-      INNER JOIN sets ON reservation.answer = sets.sets_id
-      INNER JOIN times ON menu.times_id = times.times_id
-      INNER JOIN food ON menu.food_id = food.food_id
-    WHERE reservation.user_id = ? AND menu.date = date(?)
-    '''
-    cur.execute(SQL, (user_id, today))
-    order_list = cur.fetchall()
-    print(f"orderlist = {order_list}")
-    cur.close()
-    conn.close()
-    response = make_response(render_template("./index.html", order_list=order_list, today=str(today)))
-    return response
+  user_id = authentication_session()[0]
+  today = datetime.date.today()
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+  
+  # [本日の予約済みメニューを取得]
+  SQL='''
+  SELECT times.time_str, sets.set_str, food.food_name
+  FROM reservation 
+    INNER JOIN menu ON reservation.menu_id = menu.menu_id
+                  AND  reservation.answer = menu.sets_id
+    INNER JOIN sets ON reservation.answer = sets.sets_id
+    INNER JOIN times ON menu.times_id = times.times_id
+    INNER JOIN food ON menu.food_id = food.food_id
+  WHERE reservation.user_id = ? AND menu.date = date(?)
+  '''
+  cur.execute(SQL, (user_id, today))
+  order_list = cur.fetchall()
+  print(f"orderlist = {order_list}")
+  cur.close()
+  conn.close()
+  response = make_response(render_template("./index.html", order_list=order_list, today=str(today)))
+  return response
 
 # 寮食予約システム > トップ
 @app.route('/ryosyoku_order')
 def ryosyoku_order():
-  if (authentication_session())[0] != -1:
-    # セッション認証完了
-    response = make_response(render_template("./ryosyoku_order.html"))
-    return response
-  else:
-    # セッション認証非完了
-    return redirect(url_for('login'))
+  # セッション認証
+  if authentication_redirect() != None:
+    # 認証拒否
+    return authentication_redirect()
+
+  response = make_response(render_template("./ryosyoku_order.html"))
+  return response
 
 # 寮食予約システム > 入力ページ
 @app.route('/ryosyoku_order/week', methods=["POST", "GET"])
 def week():
-  if (authentication_session())[0] == -1:
-    # セッション認証非完了
-    return redirect(url_for('login'))
-  # セッション認証完了
+  # セッション認証
+  if authentication_redirect() != None:
+    return authentication_redirect()
   user_id = (authentication_session())[0]
   
   # クエリストリング取得
@@ -117,32 +117,21 @@ def week():
 
     menu_answer_list = []
     for menu in menu_list:
-      # [入力済みの予約状況の取得]
+      # [現在の予約状況を取得]
       SQL = '''
-      SELECT COUNT(*)
+      SELECT *
       FROM reservation
         INNER JOIN sets ON reservation.answer = sets.sets_id
-      WHERE menu_id = ? AND user_id = ? AND condition = 2
+      WHERE menu_id = ? AND user_id = ? AND sets.set_str = ?
       '''
-      cur.execute(SQL, (menu[0], user_id))
-      condition_f = cur.fetchone()
-      if condition_f[0] != 0:
-        SQL = '''
-        SELECT *
-        FROM reservation
-          INNER JOIN sets ON reservation.answer = sets.sets_id
-        WHERE menu_id = ? AND user_id = ? AND condition = 2 AND sets.set_str = ?
-        '''
-        cur.execute(SQL, (menu[0], user_id, menu[1]))
-        answer = cur.fetchone()
-        
-        # フォーマットに整える
-        if answer != None:
-          menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
-        else:
-          menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], ""))
-      else:
+      cur.execute(SQL, (menu[0], user_id, menu[1]))
+      answer = cur.fetchone()
+      
+      # フォーマットに整える
+      if answer != None:
         menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
+      else:
+        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], ""))
       
     cur.close()
     conn.close()
@@ -335,49 +324,114 @@ def week():
 # 寮食予約システム > 入力完了ページ
 @app.route('/ryosyoku_order/order_complete')
 def order_complete():
-  if (authentication_session())[0] == -1:
-    # セッション認証非完了
-    return redirect(url_for('login'))
+  # セッション認証
+  if authentication_redirect() != None:
+    # 認証拒否
+    return authentication_redirect()
+
   response = make_response(render_template("./order_complete.html"))
   return response
 
 # 寮食予約システム > 管理者ページ > 入力結果
 @app.route('/ryosyoku_order/control/result', methods=["POST", "GET"])
 def control_result():
-  if (authentication_session())[1] == 2:
-    # 寮食管理者認証完了
-    # SQL操作 [メニューの取得]
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
-    SQL='''
-    SELECT reservation.menu_id, menu.date, times.time_str, sets.set_str, food.food_name, COUNT(*)
-    FROM reservation 
-      INNER JOIN menu ON reservation.menu_id = menu.menu_id
-                    AND  reservation.answer = menu.sets_id
-      INNER JOIN sets ON reservation.answer = sets.sets_id
-      INNER JOIN times ON menu.times_id = times.times_id
-      INNER JOIN food ON menu.food_id = food.food_id
-    GROUP BY reservation.menu_id, menu.date, times.time_str, sets.set_str, food.food_name
-    '''
-    # WHERE date BETWEEN date(?) AND date(?)
-    cur.execute(SQL)
-    fetch_reservation = cur.fetchall()
-    cur.close()
-    conn.close()
-    response = make_response(render_template("./control-result.html", reservation_list=fetch_reservation))
-    return response
-  else:
+  if (authentication_session())[1] != 2:
+    # セッション認証非完了
     return redirect(url_for('login'))
+  # セッション認証完了
+  # SQL操作 [メニューの取得]
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+  SQL = '''
+  SELECT menu.menu_id, menu.date, times.time_str, sets.set_str, food.food_name, COUNT(*)
+  FROM menu
+    LEFT OUTER JOIN reservation ON menu.menu_id = reservation.menu_id
+                               AND menu.sets_id = reservation.answer
+    INNER JOIN sets ON menu.sets_id = sets.sets_id
+    INNER JOIN times ON menu.times_id = times.times_id
+    INNER JOIN food ON menu.food_id = food.food_id
+  WHERE reservation.condition <> 0 OR reservation.condition IS NULL
+  GROUP BY menu.menu_id, menu.sets_id, menu.date, times.time_str, sets.set_str, food.food_name
+  '''
+  SQL = '''
+  SELECT menu_id, sets_id
+  FROM menu
+  WHERE date BETWEEN date("2022-10-01") AND date("2022-12-01")
+  '''
+  cur.execute(SQL)
+  fetch_reservation = cur.fetchall()
+
+  reservation_list = []
+  old_menu = None
+  first_menu = None
+  print(f"fetch_reservation = {fetch_reservation}")
+  for menu_id, set_id in fetch_reservation:
+    SQL = '''
+    SELECT sets.set_str, food.food_name, COUNT(*)
+    FROM menu
+      INNER JOIN reservation ON menu.menu_id = reservation.menu_id
+                            AND menu.sets_id = reservation.answer
+      INNER JOIN sets ON menu.sets_id = sets.sets_id
+      INNER JOIN food ON menu.food_id = food.food_id
+    WHERE reservation.condition <> 0
+      AND reservation.menu_id = ?
+      AND reservation.answer = ?
+    GROUP BY menu.menu_id, menu.sets_id, food.food_name
+    '''
+    cur.execute(SQL, (menu_id, set_id))
+    count_people = cur.fetchone()
+    print(f"count_people = {count_people}")
+    if old_menu == menu_id:
+      # 同じ日付
+      # SQL操作 [メニューの取得]
+      conn = sqlite3.connect("./static/database/kakaria.db")
+      cur = conn.cursor()
+      # 
+      SQL='''
+      SELECT COUNT(*)
+      FROM reservation 
+      WHERE menu_id == ?
+        AND condition == 0
+      '''
+      cur.execute(SQL, (menu_id, ))
+      not_write = cur.fetchone()[0]
+      
+      # 
+      SQL = '''
+      SELECT DISTINCT menu.date, times.time_str
+      FROM menu
+        INNER JOIN times ON menu.times_id = times.times_id
+      WHERE menu.menu_id = ?
+      '''
+      cur.execute(SQL, (menu_id, ))
+      date_time = cur.fetchone()
+      #   {% for date, time, set, food_name, people_count, not_write in reservation_list %}
+      if count_people != None:
+        reservation_list.append((date_time[0], date_time[1], (first_menu[0], count_people[0]), (first_menu[1], count_people[1]), (first_menu[2], count_people[2]), not_write))
+      else:
+        reservation_list.append((date_time[0], date_time[1], (first_menu[0], ""), (first_menu[1], ""), (first_menu[2], ""), not_write))
+    else:
+      # 新しい日付
+      if count_people != None:
+        first_menu = [count_people[0], count_people[1], count_people[2]]
+      else:
+        first_menu = ["", "", ""]
+    old_menu = menu_id
+  print(f"reservation_list = {reservation_list}")
+  cur.close()
+  conn.close()
+  response = make_response(render_template("./control-result.html", reservation_list=reservation_list))
+  return response
 
 # 寮食予約システム > 管理者 > 献立トップページ
 @app.route('/ryosyoku_order/control/input', methods=["POST", "GET"])
 def control_input():
-  if (authentication_session())[1] == 2:
-    # 寮食管理者認証完了
-    response = make_response(render_template("./control-input.html"))
-    return response
-  else:
+  if (authentication_session())[1] != 2:
+    # セッション認証非完了
     return redirect(url_for('login'))
+  # セッション認証完了
+  response = make_response(render_template("./control-input.html"))
+  return response
 
 # 寮食予約システム > 管理者 > 献立入力ページ
 @app.route('/ryosyoku_order/control/input/month', methods=["POST", "GET"])
@@ -528,16 +582,20 @@ def month():
 # 寮食感想入力ページ
 @app.route('/ryosyoku_feeling')
 def ryosyoku_feeling():
+  # セッション認証
+  if authentication_redirect() != None:
+    return authentication_redirect()
+
   response = make_response(render_template("./ryosyoku_feeling.html"))
   return response
 
 # お風呂混雑状況システム
 @app.route('/bath', methods=["GET", "POST"])
 def bath():
-  if (authentication_session())[1] == -1:
-    # セッション認証非完了
-    return redirect(url_for('login'))
-  # セッション認証完了
+  # セッション認証
+  if authentication_redirect() != None:
+    # 認証拒否
+    return authentication_redirect()
 
   user_id = authentication_session()[0]
   today = datetime.date.today()
@@ -724,30 +782,68 @@ def sinup():
     # POST
     user_name = request.form["user_name"]
     password = request.form["password"]
-
-    # SQL操作
+    today = datetime.date.today()
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+
+    # ユーザ名の一意性の確保
     cur.execute("SELECT * FROM user WHERE user_name == ?", (user_name, ))
     fetch_user = cur.fetchone()
-    cur.close()
-    conn.close()
     if fetch_user != None:
       # すでに同じユーザ名が登録されている場合
       response = make_response(render_template("./sinup.html", condition=1))
       return response
-    else:
-      # パスワードのハッシュ化
-      password_sh = password_hash(str(password))
-      # SQL操作
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
-      cur.execute("INSERT INTO user(user_name, password, permission) VALUES(?, ?, 1)", (user_name, password_sh))
+    
+    # ユーザの追加
+    password_sh = password_hash(str(password))
+    cur.execute("INSERT INTO user(user_name, password, permission) VALUES(?, ?, 1)", (user_name, password_sh))
+    conn.commit()
+    
+    # 新規ユーザのreservatioレコードを追加
+    # [menu_idの取得]
+    SQL = '''
+    SELECT menu_id, MIN(sets_id)
+    FROM menu 
+    WHERE date BETWEEN date(?) AND date(?)
+    GROUP BY menu_id
+    '''
+    cur.execute(SQL, (today, today + (datetime.timedelta(days=7+(6-today.weekday())))))
+    menu_list = cur.fetchall()
+
+    # [user_idの取得]
+    SQL = '''
+    SELECT user_id
+    FROM user
+    WHERE user_name = ?
+    '''
+    cur.execute(SQL, (user_name))
+    user_id = cur.fetchone()[0]
+    print(f"menu_list = {menu_list}")
+    print(f"user_id = {user_id}")
+
+    # [reservationにレコードを追加]
+    for menu, set in menu_list:
+      cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (menu, user_id, set))
       conn.commit()
-      cur.close()
-      conn.close()
-      # 新規会員登録完了
-      return redirect(url_for('sinup_complete'))
+    
+    # reservationの確定更新処理
+    # [予約日時が過ぎたレコードを更新]
+    SQL = '''
+      UPDATE reservation
+      SET condition = 1
+      WHERE menu_id IN(
+        SELECT DISTINCT menu_id
+        FROM menu
+        WHERE menu.date BETWEEN date(2020-04-01) AND date(?)
+      )
+    '''
+    cur.execute(SQL, (today + (datetime.timedelta(days=2)), ))
+    conn.commit()
+    
+    cur.close()
+    conn.close()
+    # 新規会員登録完了
+    return redirect(url_for('sinup_complete'))
 
 # パスワード変更ページ
 @app.route('/change_password', methods=["POST", "GET"])
@@ -918,7 +1014,7 @@ def startup():
         GROUP BY menu_id
       )
     '''
-    cur.execute(SQL, (today + (datetime.timedelta(days=UPDATE)), ))
+    cur.execute(SQL, (today + (datetime.timedelta(days=UPDATE-1)), ))
     conn.commit()
     cur.close()
     conn.close()
@@ -930,6 +1026,19 @@ def week_str(week):
   week_list = ["月", "火", "水", "木", "金", "土", "日"]
   return week_list[week]
 
+
+# 未ログインユーザ & 権限ごとにリダイレクト
+def authentication_redirect():
+  session_list = authentication_session()
+  if session_list[0] == -1:
+    # セッション認証非完了
+    print("ログインしていない")
+    return make_response(redirect(url_for('login')))
+  if session_list[1] == 2:
+    # 管理者ユーザ
+    print("管理者ユーザです。")
+    return make_response(redirect(url_for('control_result')))
+  return None
 
 # セッションIDの生成
 def create_sessid(user_id):

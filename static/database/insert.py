@@ -7,6 +7,18 @@ import datetime
 conn = sqlite3.connect('./static/database/kakaria.db')
 cur = conn.cursor()
 
+# menu表
+cur.execute("INSERT INTO menu(menu_id, sets_id) VALUES(0, 0)")
+conn.commit()
+
+# user表
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('1', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('2', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('3', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('4', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('s', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 2)")
+conn.commit()
+
 cur.execute("INSERT INTO 'main'.'food' ('food_id', 'food_name') VALUES ('1', 'test')")
 cur.execute("INSERT INTO 'main'.'food' ('food_id', 'food_name') VALUES ('2', 'ご飯')")
 cur.execute("INSERT INTO 'main'.'food' ('food_id', 'food_name') VALUES ('3', 'パン')")
@@ -197,6 +209,13 @@ cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id'
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('60', '0', '2022-10-31', '2', '72', '0')")
 cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('60', '1', '2022-10-31', '2', '73', '0')")
 
+
+# test
+cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('61', '1', '2022-10-15', '1', '71', '0')")
+cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('62', '0', '2022-10-16', '2', '72', '0')")
+cur.execute("INSERT INTO 'main'.'menu' ('menu_id', 'sets_id', 'date', 'times_id', 'food_id', 'minimum_number') VALUES ('63', '1', '2022-10-17', '2', '73', '0')")
+
+
 conn.commit()
 cur.close()
 conn.close()
@@ -254,14 +273,19 @@ if True:
       cur.close()
       conn.close()
 
-# conn = sqlite3.connect("./static/database/kakaria.db")
-# cur = conn.cursor()
-# # [入力確定のみ更新]
-# SQL = '''
-#   UPDATE reservation
-#   SET 
-# '''
-# cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (menu, user[0], set))
-# conn.commit()
-# cur.close()
-# conn.close()
+conn = sqlite3.connect("./static/database/kakaria.db")
+cur = conn.cursor()
+# [入力確定のみ更新]
+SQL = '''
+  UPDATE reservation
+  SET condition = 1
+  WHERE menu_id IN(
+    SELECT DISTINCT menu_id
+    FROM menu
+    WHERE menu.date BETWEEN date(2020-04-01) AND date(?)
+  )
+'''
+cur.execute(SQL, (today + (datetime.timedelta(days=2)), ))
+conn.commit()
+cur.close()
+conn.close()

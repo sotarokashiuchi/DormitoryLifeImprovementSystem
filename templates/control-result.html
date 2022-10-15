@@ -4,13 +4,10 @@
   <a href="/ryosyoku_order/control/input">入力</a>
   <h1>管理者画面 : 集計</h1>
 
-  {% set ns = namespace(old_menu = 0) %}
-  {% for menu_id, date, time, set, food_name, people_count in reservation_list %}
-    {% if ns.old_menu - menu_id != 0 or loop.index == 1 %}  <!-- loop.indexは特殊な変数.ループの回数を保持 -->
-      <!-- 新しい日付,新しい時間帯 -->
-      <h3>{{date}}({{time}})</h3>
-    {% endif %}
-    <p>{{set}}:{{food_name}}:{{people_count}}</p>
-    {% set ns.old_menu = menu_id%}
+  {% for date, time, set, food_name, people_count, not_write in reservation_list %}
+      <p>{{date}}({{time}})</p>
+      <p>{{set[0]}}:{{food_name[0]}}{{people_count[0]}}</p>
+      <p>{{set[1]}}:{{food_name[1]}}{{people_count[1]}}</p>
+      <p>未入力者:{{not_write}}</p>
   {% endfor %}
 {% endblock %}
