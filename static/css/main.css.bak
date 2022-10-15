@@ -21,7 +21,7 @@ header{
   justify-content: space-between;
 }
 .topmenu1{
-  justify-content: space-evenly;
+  justify-content: space-between;
   list-style: none;
   margin: 16px 20px 0px 0px;
   text-align: right;
@@ -149,7 +149,7 @@ header{
   }
   /*** ボタン全体 ***/
   .menu-btn{
-    display: flex;
+    display: block;
     position: relative; /*線の起点*/
     width: 100px; /*ボタンの幅*/
     height: 100px; /*ボタンの高さ*/
@@ -159,6 +159,9 @@ header{
   /*** ボタンの三本線（共通） ***/
   #accordion-menu{
     margin-top: 0px;
+    position: fixed;
+    left: 75%;
+    top: -7px;
   }
   .menu-btn span{
     position: absolute;
@@ -282,7 +285,7 @@ input[type="text"] , input[type="password"]{
  }
 }
 
-input[type="submit"] {
+input[type="submit"] , form input[type="reset"]{
   /* padding-top: 3px;
   padding-bottom: 3px; */
   height: 28px;
