@@ -647,3 +647,19 @@ input.monthC{
   font-size: 90%;     
 }
 }
+
+.result{
+  width: 250px;
+}
+
+.result1{
+  width: 180px;
+}
+
+.result2{
+  width: 150px;
+}
+ 
+.result3{
+  font-size: 30px;
+}

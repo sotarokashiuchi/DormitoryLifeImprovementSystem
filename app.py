@@ -339,9 +339,11 @@ def control_result():
     # セッション認証非完了
     return redirect(url_for('login'))
   # セッション認証完了
-  # SQL操作 [メニューの取得]
+
+  today = datetime.date.today()
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
+  
   SQL = '''
   SELECT menu.menu_id, menu.date, times.time_str, sets.set_str, food.food_name, COUNT(*)
   FROM menu
@@ -356,9 +358,9 @@ def control_result():
   SQL = '''
   SELECT menu_id, sets_id
   FROM menu
-  WHERE date BETWEEN date("2022-10-01") AND date("2022-12-01")
+  WHERE date BETWEEN date(?) AND date(?)
   '''
-  cur.execute(SQL)
+  cur.execute(SQL, (today, today + (datetime.timedelta(days= 7 + (6-today.weekday())))))
   fetch_reservation = cur.fetchall()
 
   reservation_list = []
@@ -405,7 +407,6 @@ def control_result():
       '''
       cur.execute(SQL, (menu_id, ))
       date_time = cur.fetchone()
-      #   {% for date, time, set, food_name, people_count, not_write in reservation_list %}
       if count_people != None:
         reservation_list.append((date_time[0], date_time[1], (first_menu[0], count_people[0]), (first_menu[1], count_people[1]), (first_menu[2], count_people[2]), not_write))
       else:
