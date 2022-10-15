@@ -110,7 +110,7 @@
     font-size: 13px;
     border: 1px solid;
     display: inline-block;
-    background-color: rgb(21 210 0 / 68%);
+    background-color: #a4fff2;
     border-color: white;
     color: white;
     cursor: pointer;

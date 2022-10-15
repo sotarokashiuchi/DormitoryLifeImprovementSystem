@@ -1,7 +1,7 @@
 {% extends "./base.html" %}
 
 {% block body %}
-  <a href="/ryosyoku_order/control/input" class="result3">入力</a>
+  <a id="input" href="/ryosyoku_order/control/input">献立入力はこちら</a>
   <h1>管理者画面 : 集計</h1>
   {% for date, time, set, food_name, people_count, not_write in reservation_list %}
    <table>
@@ -10,14 +10,14 @@
           <p>{{date}}({{time}})</p>
         </td>
         <td rowspan="2" class="result1">
-          <p>未入力者:{{not_write}}</p>
+          <p>未入力者:{{not_write}}人</p>
         </td>
          <td class="result">
-            <p>{{set[0]}}:{{food_name[0]}}{{people_count[0]}}</p>  
+            <p>{{set[0]}}:{{people_count[0]}}人:{{food_name[0]}}</p>  
           </td>
         <tr>
          <td>
-            <p>{{set[1]}}:{{food_name[1]}}{{people_count[1]}}</p>
+            <p>{{set[1]}}:{{people_count[1]}}人:{{food_name[1]}}</p>
           </td>  
         </tr>
       </tr>

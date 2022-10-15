@@ -7,6 +7,8 @@
 
 {% block body %}
   <!-- グラフの表示 -->
+  <h3>グラフの見方</h3>
+  <p>赤：混雑している 黄色：少し混雑している 青：すいている</p>
   <div class="graph-wrap">
     <div class="graph-wrap-graph">
       <div class="graph-wrap-today">
@@ -85,12 +87,6 @@
         </div>
       </div>
     </div>
-    <h3>グラフの見方</h3>
-    <span class="mrg-10">赤：混雑している</span>
-    <span class="mrg-10">黄色：少し混雑している</span>
-    <span class="mrg-10">青：すいている</span>
-    <p class="index-exp">赤：混雑している 黄色：少し混雑している</p>
-    <p class="index-exp">青：すいている</p>
     <!-- 簡易版 -->
     <div class="simplemenu">
       <p>未入浴:{{people_list[0]}}</p>
