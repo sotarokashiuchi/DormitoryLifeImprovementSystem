@@ -5,26 +5,26 @@
   <form action="/ryosyoku_order/control/input/month?key={{key}}" method="post">
     <table>
       <tr>
-        <th>メニュー</th><th>セット</th><th>最初個数</th>
+        <th>メニュー</th><th>セット</th><th>最小個数</th>
       </tr>
       {% for month, day, week, time, text_value, minimum_number in menu_list %}
       <tr>
         <td rowspan="2" class="monthday">
           <p>{{month}}月{{day}}日({{week}})({{time}})</p>
         </td>
-        <td class="monthA">
-          A:<input type="text" name="{{month}}:{{day}}:{{time}}:A:name" value="{{text_value[0]}}" class="monthC">
+        <td class="menuA">
+          A:<input type="text" name="{{month}}:{{day}}:{{time}}:A:name" value="{{text_value[0]}}" class="menu-phone">
         </td>
         
-        <td class="month1">
+        <td class="menuA-limit">
           <input type="number" name="{{month}}:{{day}}:{{time}}:A:number" value="{{minimum_number[0]}}"><br>
         </td> 
           <tr>
-             <td class="monthB">
-              B:<input type="text" name="{{month}}:{{day}}:{{time}}:B:name" value="{{text_value[1]}}" class="monthC"> 
+             <td class="menuB">
+              B:<input type="text" name="{{month}}:{{day}}:{{time}}:B:name" value="{{text_value[1]}}" class="menu-phone"> 
             </td>
             
-            <td class="month2">
+            <td class="menuB-limit">
               <input type="number" name="{{month}}:{{day}}:{{time}}:B:number" value="{{minimum_number[1]}}">
             </td>
           </tr>

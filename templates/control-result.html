@@ -6,13 +6,13 @@
   {% for date, time, set, food_name, people_count, not_write in reservation_list %}
    <table>
       <tr>
-        <td rowspan="2" class="result2">
+        <td rowspan="2" class="control-result-day">
           <p>{{date}}({{time}})</p>
         </td>
-        <td rowspan="2" class="result1">
+        <td rowspan="2" class="control-result-not_write">
           <p>未入力者:{{not_write}}人</p>
         </td>
-         <td class="result">
+         <td class="control-result">
             {% if people_count[0]=="" %}
               <p>0人</p>
             {% else %}

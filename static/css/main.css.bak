@@ -4,7 +4,6 @@ body{
   margin: 0px;
   text-align: center;
 }
-
 /* base */
 header a , .selectmonth a{
   text-decoration: none;
@@ -90,9 +89,10 @@ header{
 #open{
   display: none;
 }
+
 @media screen and (max-width:1100px){
   #logo{
-    margin-left: 10px;
+    margin-left: 20px;
   }
 }
 @media screen and (max-width:520px){
@@ -150,60 +150,67 @@ header{
   .topmenu1 li a:active , .topmenu2 li a:active{
     background-color: #808080;
   }
-  /* 三本線 */
+  /*** ボタン全体 ***/
   .menu-btn{
     display: flex;
-    position: relative; 
-    width: 68px; 
-    height: 68px; 
-    cursor: pointer; 
-    z-index: 100;
+    position: relative; /*線の起点*/
+    width: 68px; /*ボタンの幅*/
+    height: 68px; /*ボタンの高さ*/
+    cursor: pointer; /*クリック可能を伝える*/
+    z-index: 100; /*最前面*/
   }
+  /*** ボタンの三本線（共通） ***/
   #accordion-menu{
     margin-top: 0px;
   }
   .menu-btn span{
     position: absolute;
-    width: 40%; 
-    height: 4px;
-    left: calc(50% - 40% / 2);
-    background: #000;
+    width: 40%; /*線の長さ*/
+    height: 4px; /*線の太さ*/
+    left: calc(50% - 40% / 2); /*中央から長さの半分を引く*/
+    background: #000; /*線の色*/
     transition: .4s;
   }
+  /* 順に上・中・下の線 */
   .top-bar{
-    top: calc(35% - 2px / 2);
+    top: calc(35% - 2px / 2); /*上から35%の位置*/ 
   }
   .center-bar{
-    top: calc(50% - 2px / 2);
+    top: calc(50% - 2px / 2); /*上から50%の位置*/
   }
   .under-bar{
-    top: calc(65% - 2px / 2);
+    top: calc(65% - 2px / 2); /*上から65%の位置*/
   }
+  /** クリック後(✔が入った後)の線 **/
+  /*上の線*/
   #open:checked ~ .menu-btn > .top-bar {
-    top: calc(50% - 2px / 2);
-    transform: rotate(45deg);
+    top: calc(50% - 2px / 2); /*中央*/
+    transform: rotate(45deg); /*45度回転*/
   }
+  /*中の線*/
   #open:checked ~ .menu-btn > .center-bar{
-    opacity: 0;
+    opacity: 0;/*真ん中の線は透過*/
   }
+  /*下の線*/
   #open:checked ~ .menu-btn > .under-bar{
-    top: calc(50% - 2px / 2);
-    transform: rotate(-45deg);
+    top: calc(50% - 2px / 2); /*中央*/
+    transform: rotate(-45deg); /*-45度回転*/
   }
+  /*** メニュー内容 ***/
   .inner-menu{
-    position: fixed;
+    position: fixed; /*画面固定*/
     top: 0;
     left: 0;
-    width: 100vw;
+    width: 100vw; /*全画面*/
     height: 100vh;
     box-sizing: border-box;
-    padding: 80px 60px 0px 80px;
-    background: rgb(188, 188, 188);
-    opacity: 0;
-    visibility: hidden;
+    padding: 80px 60px 0px 80px; /*ボタンと被らない位には*/
+    background: rgb(188, 188, 188); /*背景*/
+    opacity: 0; /*透明*/
+    visibility: hidden; /*標準で非表示*/
     transition: .5s;
-    z-index: 99;
-    overflow-y: scroll;
+    z-index: 99; /*ボタンより背面(小さい値)*/
+    overflow-y: scroll; /*スクロール可*/
     text-align: center;
   }
   #open:checked ~ .inner-menu{
@@ -233,7 +240,7 @@ header{
   }
 }
 
-/* login , change_password */
+/* login */
 .elementstyle {
   font-family: sans-serif;
   margin: 60px auto 60px auto;
@@ -243,11 +250,13 @@ header{
   max-width: 365px;
 }
 input[type="text"] , input[type="password"]{
-  height: 19px;
   width: 220px;
+  height: 19px;
   font-size: 80%;     
 }
 input[type="submit"] {
+  /* padding-top: 3px;
+  padding-bottom: 3px; */
   height: 28px;
   margin-bottom: 20px;
   margin-top: 45px;
@@ -255,67 +264,87 @@ input[type="submit"] {
   font-size: 13px;
   border: 1px solid;
   display: inline-block;
-  background-color: rgb(21 210 0 / 68%);
+  background-color: rgb(21 210 0 / 68%); /* 背景色 */
   border-color: white;
   color: white;
   cursor: pointer;
-  text-decoration: none;
-}
-.elementstyle-link {
-  color: rgb(0, 187, 255);
-  padding-right: 15px;
-  padding-left: 30px;
-}
-.elementstyle-link:hover {
-  color: #3562c2;
-}
-.miss{
-  color: red;
+  text-decoration: none; /* 文字の下線を消す */
 }
 @media screen and ( max-width:960px){
   .elementstyle {
     background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247);
+    border: 1px solid rgb(244, 245, 247); 
+    font-family: sans-serif;
     margin: 50px auto 60px auto;
+    color: rgb(39, 39, 40);
     max-width: 450px;
   }
-  .h1size{
-    font-size: 30px;
-   }
+  input[type="text"] , input[type="password"]{
+    padding-top: 0px;
+    padding-bottom: 0px;   
+    height: 25px;
+    width: 280px;
+    font-size: 100%; 
+ }
+ .h1size{
+  font-size: 30px;
+ }
+ input[type="submit"] , form input[type="reset"]{
+  height: 30px;
+  width: 264px;
+}
+}
+@media screen and ( max-width:520px){
+  .elementstyle {
+    background-color: rgb(244, 245, 247);
+    border: 1px solid rgb(244, 245, 247); 
+    font-family: sans-serif;
+    margin: 50px auto 60px auto;
+    color: rgb(39, 39, 40);
+    max-width: 400px;
+  }
   input[type="text"] , input[type="password"]{
     padding-top: 0px;
     padding-bottom: 0px;
-    height: 25px;
-    width: 280px;   
-    font-size: 100%; 
-  }
-  input[type="submit"]{
-  height: 30px;
-  width: 264px;
-  }
-}
-@media screen and ( max-width:520px){
-  .elementstyle { 
-    max-width: 400px;
-  }
-  .h1size{
-    font-size: 27px;
-   }
-  input[type="text"] , input[type="password"]{
     height: 23px;
+    font-size: 100%;  
     width: 220px;   
-  }
-  input[type="submit"]{
-    width: 225px;
-  }
-  .elementstyle-link {
+ }
+ .h1size{
+  font-size: 27px;
+ }
+ input[type="submit"] , form input[type="reset"]{
+  width: 225px;
+}
+}
+.miss{
+  color: red;
+}
+
+.miss1{
+  color: red;
+  font-size: 13pt;
+}
+
+.regulation {
+  color: rgb(0, 187, 255);
+  padding-right: 15px;
+  padding-left: 30px;
+}
+
+.regulation:hover {
+  color: #3562c2;
+} 
+
+@media screen and ( max-width:520px){
+  .regulation {
+    color: rgb(0, 187, 255);
     padding-right: 3px;
     padding-left: 15px;
   }
-}
 
-/* ryosyoku_order */
-.oder-elementstyle{
+}
+.elementstyle1{
   font-family: sans-serif;
   margin: 100px auto auto auto;
   height: 300px;
@@ -324,87 +353,113 @@ input[type="submit"] {
   background-color: rgb(244, 244, 244);
   border: 1px solid #555; 
 }
-.order1{
-  margin-top: 50px;
+
+@media screen and ( max-width:960px){
+  .elementstyle1{
+    font-family: sans-serif;
+    margin: 100px auto auto auto;
+    height: 300px;
+    width: 420px;
+    color: rgb(39, 39, 40);
+    background-color: rgb(244, 245, 247);
+    border: 1px solid rgb(244, 245, 247);
+    margin-top: 100px;
+  }
 }
+
+@media screen and ( max-width:520px){
+  .elementstyle1{
+    font-family: sans-serif;
+    margin: 100px auto auto auto;
+    height: 300px;
+    width: 318px;
+    color: rgb(39, 39, 40);
+    background-color: rgb(244, 245, 247);
+    border: 1px solid rgb(244, 245, 247);
+  }
+}
+
 .order{
   text-decoration: none;
   color: rgb(0, 187, 255);
   font-size: 17pt;
 }
-.order:hover{
-  color: #3562c2;
-}
-a.order{
-  margin-left: 30px;
-  margin-right: 30px;
-}
-.attention{
-  color: red;
-  font-size: 13pt;
-}
-@media screen and ( max-width:960px){
-  .oder-elementstyle{
-    width: 420px;
-    border: 1px solid rgb(244, 245, 247);
-    margin-top: 100px;
-  }
-}
+
 @media screen and ( max-width:520px){
-  .oder-elementstyle{
-    width: 318px;
-  }
   .order{
+    text-decoration: none;
+    color: rgb(0, 187, 255);
     font-size: 15pt;
   }
 }
 
-/* sinup_complete */
-.sinup_complete{
+.order1{
+  margin-top: 50px;
+}
+
+a.order{
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+.order:hover{
+  color: #3562c2;
+}
+
+.sinup2:hover{
+  color: #3562c2;
+}
+ 
+.sinup2{
+  color: rgb(0, 187, 255);
+}
+
+.sinup{
   padding-top: 180px;
   text-align: center;
 }
-.sinup_complete-h1{
+ 
+.sinup1{
   font-size: 25pt;
   padding-bottom: 60px;
 }
-.sinup_complete-a{
-  color: rgb(0, 187, 255);
-}
-.sinup_complete-a:hover{
-  color: #3562c2;
-}
-.sinup_complete-p{
-  font-size: 13pt;
-}
-@media screen and ( max-width:960px){
-  .sinup_complete{
-    padding-top: 100px;
+ 
+.sinup3{
+  font-size: 13pt;}
+
+  @media screen and ( max-width:960px){
+    .sinup{
+      padding-top: 100px;
+      text-align: center;
+    }
+    .sinup1{
+      font-size: 34px;
+      padding-bottom: 30px;
+    }
+    .sinup3{
+      font-size: 16px;}
   }
-  .sinup_complete-h1{
-    font-size: 34px;
+
+ @media screen and ( max-width:520px){
+  .sinup{
+    padding-top: 50px;
+    text-align: center;
+  }
+  .sinup1{
+    font-size: 23px;
     padding-bottom: 30px;
   }
-  .sinup_complete-p{
-    font-size: 16px;
-  }
-}
-@media screen and ( max-width:520px){
-  .sinup_complete{
-    padding-top: 50px;
-  }
-  .sinup_complete-h1{
-    font-size: 23px;
-  }
-  .sinup_complete-p{
+  .sinup3{
     font-size: 13px;}
 }
   
 
 /* week */
+/* リセットボタンと送信ボタンの設定 */
 .botton{
   text-align: center;
 }
+/* h1タグの設定 */
 #week_h1{
   font-size: 40px;
   text-align: center;
@@ -415,15 +470,20 @@ a.order{
 .form{
   font-size: 25px;
 }
+
+/* 表の設定 */
 table{
-  border-collapse: collapse;
+  border-collapse: collapse;  /* th、tdなどの隣接するセルの枠線を重ねて表示する */
   margin-right: auto;
   margin-left: auto;
   text-align: left;
 }
 table th,table td{
-  border:1px #999 solid;
+  border:1px #999 solid; /* 枠線をつける */
 }
+
+
+/* ラジオボタンの設定（装飾とか） */
 .container {
   display: inline-block;
   justify-content: center;
@@ -443,6 +503,7 @@ table th,table td{
   padding-left: 35px;
   cursor: pointer;
 }
+
 .menu-label .menu-text:before {
   content: "";
   position: absolute;
@@ -474,6 +535,7 @@ table th,table td{
   border-radius: 40px;
 }
 
+
 /* control */
 #result, #input{
   display: block;
@@ -485,6 +547,31 @@ table th,table td{
 #explanation{
   margin-top: 40px;
 }
+
+.monthday{
+  width: 150px;
+}
+ 
+.monthA{
+  width: 300px;
+  height: 32px;
+  border-bottom:#F4F5F7 ;
+}
+
+.monthB{
+  height: 32px;
+  border-top: #F4F5F7;
+}
+
+.month1{
+  width: 190px;
+  border-bottom:#F4F5F7 ;
+}
+
+.month2{
+  border-top: #F4F5F7;
+}
+
 .selectmonth ul{
   display: flex;
   list-style: none;
@@ -496,6 +583,7 @@ table th,table td{
   font-size: 20px;
   justify-content: space-around;
 }
+
 #phone{
   display: none;
 }
@@ -508,80 +596,78 @@ table th,table td{
   }
 }
 
-/* month */
-.monthday{
-  width: 150px;
-}
-.menuA{
-  width: 300px;
-  height: 32px;
-  border-bottom:#F4F5F7 ;
-}
-.menuB{
-  height: 32px;
-  border-top: #F4F5F7;
-}
-.menuA-limit{
-  width: 190px;
-  border-bottom:#F4F5F7 ;
-}
-.menuB-limit{
-  border-top: #F4F5F7;
-}
-@media screen and ( max-width:960px){
-  input.menu-phone{
-    width: 200px;
-    height: 22px;
-    font-size: 90%;     
-  }
-}
-
-/* order_complete */
-.order_complete{
+.ordercom{
   margin-top: 100px;
   margin-bottom: 45px;
 } 
-.order_complete1:hover{
+
+.ordercom1:hover{
   color: #3562c2;
 }
-.order_complete2{
-  margin-bottom: 40px;
-}
-.order_complete3{
+
+.ordercom2{
   font-size: 14pt;
 }
+
+.ordercom3{
+ margin-bottom: 40px;
+}
+
 @media screen and ( max-width:520px){
-  .order_complete{  
+  .ordercom{  
      font-size: 23px
-  }
-  .order_complete2{
+  }  
+
+  .ordercom2{
     font-size: 10pt;
   }
 }
 
-/* ryosyoku_feeling */
 .feeling{
   resize: none;
   width:600px;
   height:250px;
   font-size: 16pt;
-  padding: 10px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
 }
+
 @media screen and ( max-width:520px){
   .feeling{ 
+    resize: none;
     width: 341px;
+    height: 250px;
     font-size: 14pt;
-    padding: 8px;
+    padding-top: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
  }
 }
 
+@media screen and ( max-width:960px){
+input.monthC{
+  width: 200px;
+  height: 22px;
+  font-size: 90%;     
+}
+}
+
 /* control-result */
-.control-result{
+.result{
   width: 250px;
 }
-.control-result-not_write{
+
+.result1{
   width: 180px;
 }
-.control-result-day{
+
+.result2{
   width: 150px;
 }
+ 
+/* .result3{
+  font-size: 30px;
+} */
