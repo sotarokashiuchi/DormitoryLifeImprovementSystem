@@ -7,10 +7,6 @@ import datetime
 conn = sqlite3.connect('./static/database/kakaria.db')
 cur = conn.cursor()
 
-# menu表
-cur.execute("INSERT INTO menu(menu_id, sets_id) VALUES(0, 0)")
-conn.commit()
-
 # user表
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test1', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test2', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
