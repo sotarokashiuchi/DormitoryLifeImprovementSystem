@@ -13,11 +13,19 @@
           <p>未入力者:{{not_write}}人</p>
         </td>
          <td class="result">
-            <p>{{set[0]}}:{{people_count[0]}}人:{{food_name[0]}}</p>  
+            {% if people_count[0]=="" %}
+              <p>0人</p>
+            {% else %}
+              <p>{{set[0]}}:{{people_count[0]}}人:{{food_name[0]}}</p>  
+            {% endif %}
           </td>
         <tr>
          <td>
-            <p>{{set[1]}}:{{people_count[1]}}人:{{food_name[1]}}</p>
+          {% if people_count[1]=="" %}
+            <p>0人</p>
+          {% else %}
+            <p>{{set[1]}}:{{people_count[1]}}人:{{food_name[1]}}</p>  
+          {% endif %}
           </td>  
         </tr>
       </tr>

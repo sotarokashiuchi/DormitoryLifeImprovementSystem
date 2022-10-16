@@ -2,8 +2,7 @@
 import calendar
 import hashlib
 import random
-from traceback import print_tb
-from flask import Flask, make_response, redirect, render_template, request, session, url_for
+from flask import Flask, make_response, redirect, render_template, request, url_for
 import sqlite3
 import datetime
 
@@ -77,23 +76,22 @@ def week():
   # セッション認証
   if authentication_redirect() != None:
     return authentication_redirect()
-  user_id = (authentication_session())[0]
   
-  # クエリストリング取得
-  key = request.args.get("key")
+  user_id = (authentication_session())[0]
+  key = request.args.get("key")   # クエリストリング取得
   if key != '1' and key != '2':
     # week1,2以外にアクセス
     return redirect(url_for('ryosyoku_order'))
+  today = datetime.date.today()
+  monday = today - datetime.timedelta(days=today.weekday())
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
 
   if request.method == "GET":
     # GET
-    today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday())
     start_day = [monday.month, monday.day]
     end_day = [(monday + (datetime.timedelta(days=6))).month, (monday + (datetime.timedelta(days=6))).day]
     print(start_day)
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
     
     # [該当メニューの取得]
     SQL = '''
@@ -140,12 +138,6 @@ def week():
     return response
   else:
     # POST
-    # SQL操作 [メニューの取得]
-    today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday())
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
-    
     # [該当メニューの取得]
     SQL = '''
       SELECT DISTINCT menu_id
@@ -162,27 +154,26 @@ def week():
     cur.execute(SQL, (user_id, monday + (datetime.timedelta(days=7*(int(key)-1))), monday + (datetime.timedelta(days=7*(int(key)-1) + 6))))
     print(monday + (datetime.timedelta(days=7*(int(key)-1) + 6)))
     menu_id_list = cur.fetchall()
-    cur.close()
-    conn.close()
+
     print(f"fetch_menu={menu_id_list}", end="\n")
     for menu_id in menu_id_list:
       # POSTを受け取る
       set = request.form[str(menu_id[0])]
 
-      # SQL操作 []
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
+      # [set_idに変換]
       cur.execute("SELECT sets_id FROM sets WHERE set_str = ?", (set, ))
       set_id = cur.fetchone()
 
-      # 既にデータベースに登録されているか確認
+      # [既にデータベースに登録されているか確認]
       cur.execute("SELECT * FROM reservation WHERE menu_id = ? AND user_id = ?", (int(menu_id[0]), user_id))
       if cur.fetchone() == None:
         # 未登録
+        # [新規で登録]
         cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 2, ?)", (int(menu_id[0]), user_id, int(set_id[0])))
         conn.commit()
       else:
         # 登録済み
+        # [予約状況を更新]
         SQL='''
         UPDATE reservation 
         SET condition = 2,
@@ -215,7 +206,7 @@ def week():
       complete_peoples = cur.fetchall()
       print(f"セット別入力者数 complete_peoples = {complete_peoples}")
 
-      # [セット別最小個数] // 昇順にしなダメ？
+      # [セット別最小個数]
       SQL = '''
       SELECT sets_id, minimum_number
       FROM menu
@@ -225,12 +216,9 @@ def week():
       minimum_numbers = cur.fetchall()
       print(f"minimum_numbers = {minimum_numbers}")
 
-      # minimum_numbers.append((-1, -1))
-      # complete_peoples.append((-1, -1))
       complete_people = 0
       minimum_number = 0
       people_count = 0
-      # complete_peoples_index = 0
       
       minimum_number_list = []
       for minimum_number_set, minimum_number in minimum_numbers:
@@ -289,7 +277,7 @@ def week():
               cur.execute(SQL, (complete_people[0], menu_id[0], user_id_list[0]))
               conn.commit()
         
-        # conditionを1に変更
+        # [conditionを1に変更]
         SQL = '''
           UPDATE reservation
           SET condition = 1
@@ -317,8 +305,8 @@ def week():
         cur.execute(SQL, (menu_id[0], ))
         conn.commit()
 
-      cur.close()
-      conn.close()
+    cur.close()
+    conn.close()
     return redirect(url_for('order_complete'))
 
 # 寮食予約システム > 入力完了ページ
@@ -344,17 +332,7 @@ def control_result():
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
   
-  SQL = '''
-  SELECT menu.menu_id, menu.date, times.time_str, sets.set_str, food.food_name, COUNT(*)
-  FROM menu
-    LEFT OUTER JOIN reservation ON menu.menu_id = reservation.menu_id
-                               AND menu.sets_id = reservation.answer
-    INNER JOIN sets ON menu.sets_id = sets.sets_id
-    INNER JOIN times ON menu.times_id = times.times_id
-    INNER JOIN food ON menu.food_id = food.food_id
-  WHERE reservation.condition <> 0 OR reservation.condition IS NULL
-  GROUP BY menu.menu_id, menu.sets_id, menu.date, times.time_str, sets.set_str, food.food_name
-  '''
+  # [該当期間のmenu_id, set_idの取得]
   SQL = '''
   SELECT menu_id, sets_id
   FROM menu
@@ -363,11 +341,13 @@ def control_result():
   cur.execute(SQL, (today, today + (datetime.timedelta(days= 7 + (6-today.weekday())))))
   fetch_reservation = cur.fetchall()
 
+  # 予約状況を分類別に把握
   reservation_list = []
   old_menu = None
   first_menu = None
   print(f"fetch_reservation = {fetch_reservation}")
   for menu_id, set_id in fetch_reservation:
+    # [予約済みの人数の取得]
     SQL = '''
     SELECT sets.set_str, food.food_name, COUNT(*)
     FROM menu
@@ -385,10 +365,7 @@ def control_result():
     print(f"count_people = {count_people}")
     if old_menu == menu_id:
       # 同じ日付
-      # SQL操作 [メニューの取得]
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
-      # 
+      # [未予約の人数を取得]
       SQL='''
       SELECT COUNT(*)
       FROM reservation 
@@ -398,7 +375,7 @@ def control_result():
       cur.execute(SQL, (menu_id, ))
       not_write = cur.fetchone()[0]
       
-      # 
+      # [日付、時間帯を取得]
       SQL = '''
       SELECT DISTINCT menu.date, times.time_str
       FROM menu
@@ -407,17 +384,22 @@ def control_result():
       '''
       cur.execute(SQL, (menu_id, ))
       date_time = cur.fetchone()
+
       if count_people != None:
+        # 予約済み者がいない
         reservation_list.append((date_time[0], date_time[1], (first_menu[0], count_people[0]), (first_menu[1], count_people[1]), (first_menu[2], count_people[2]), not_write))
       else:
         reservation_list.append((date_time[0], date_time[1], (first_menu[0], ""), (first_menu[1], ""), (first_menu[2], ""), not_write))
     else:
       # 新しい日付
       if count_people != None:
+        # 予約済み者がいない
         first_menu = [count_people[0], count_people[1], count_people[2]]
       else:
         first_menu = ["", "", ""]
+    # 日付データの更新
     old_menu = menu_id
+  
   print(f"reservation_list = {reservation_list}")
   cur.close()
   conn.close()
@@ -442,32 +424,33 @@ def month():
     return redirect(url_for('login'))
   # セッション認証完了
   
+  # クエリストリングの取得
   key = request.args.get("key")
   if not(1 <= int(key) <=12) :
     # 1~12月以外にアクセス
     return redirect(url_for('control_input'))
 
+  # 該当する月の平日の日付を取得
   week = calendar.monthrange(YEAR, int(key))[0]
   max_day = calendar.monthrange(YEAR, int(key))[1]
-  # day_list = [day + 1 for day in range(max_day)]
   day_list = []
   for day in range(max_day):
     if week == 5 or week == 6:
-      # day_list.remove(day+1)
       week = (week + 1) % 7
       continue
     day_list.append((day+1, week))
     week = (week + 1) % 7
   print(day_list)
 
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
   if request.method == "GET":
     # GET
+    # 献立入力欄のリストの作成
     menu_list = []
-    # SQL操作 [menu_idの最大値を取得]
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
     for day, week in day_list:
       for time in ["昼", "夜"]:
+        # [既に入力済み献立を取得]
         SQL = '''
         SELECT menu.sets_id, food.food_name, menu.minimum_number
         FROM menu
@@ -480,6 +463,8 @@ def month():
         cur.execute(SQL, (datetime.date(YEAR, int(key), day), time))
         food_names = cur.fetchall()
         print(f"food_names={food_names}")
+        
+        # フォーマットを整える
         food_name_list = ["", ""]
         minimum_number_list = [0, 0]
         if food_names != None:
@@ -493,8 +478,10 @@ def month():
             else:
               continue
         if week == 4 and time == "夜":
+          # 金曜日の夜
           continue
         menu_list.append((int(key), day, week_str(week), time, (food_name_list[0], food_name_list[1]), (minimum_number_list[0], minimum_number_list[1])))
+    
     cur.close()
     conn.close()
     print(f"menu_list{menu_list}")
@@ -502,7 +489,7 @@ def month():
     return response
   else:
     # POST
-    # change 一度入力してしまうと、空白の状態にできない。
+    # 要改良点 一度入力してしまうと、空白の状態にできない。
     menu_list = []
     times = ['朝', '昼', '夜']
     sets = ['A', 'B']
@@ -518,6 +505,7 @@ def month():
             else:
               menu_list.append((f"{YEAR}-{int(key):02}-{int(day):02}", time, set, "パン", 0))
             continue
+          # フォーマットに整える
           # 書式 {{month}}:{{day}}:{{time}}:A:name
           food_name = request.form[f"{key}:{day}:{time}:{set}:name"]
           number = request.form[f"{key}:{day}:{time}:{set}:number"]
@@ -527,21 +515,17 @@ def month():
             menu_list.append((f"{YEAR}-{int(key):02}-{int(day):02}", time, set, food_name, number))
     print(menu_list)
     
-    # SQL操作 [menu_idの最大値を取得]
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
-    ##### error
+    # [menu_idの最大値を取得]
     cur.execute("SELECT MAX(menu_id) FROM menu")
     max_menu_id = int(cur.fetchone()[0])
-    cur.close()
-    conn.close()
+    if max_menu_id == None:
+      # 最大値が存在しない場合
+      max_menu_id = 0
 
     old_date = ""
     old_time = 0
     for date, time, set, food_name, minimum_number in menu_list:
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
-      # SQL操作 [メニューに登録]
+      # [変換処理]
       cur.execute("SELECT sets_id FROM sets WHERE set_str = ?", (set, ))
       set_id = cur.fetchone()
       cur.execute("SELECT times_id FROM times WHERE time_str = ?", (time, ))
@@ -549,16 +533,18 @@ def month():
       cur.execute("SELECT food_id FROM food WHERE food_name = ?", (food_name, ))
       food_id = cur.fetchone()
       if food_id == None:
+        # 新規メニュー
+        # [メニューの追加]
         cur.execute("INSERT INTO food(food_name) VALUES(?)", (food_name, ))
         conn.commit()
         cur.execute("SELECT food_id FROM food WHERE food_name = ?", (food_name, ))
         food_id = cur.fetchone()
       
-      # 未登録か検索
+      # [未登録か検索]
       cur.execute("SELECT * FROM menu WHERE date = date(?) AND times_id = ? AND sets_id = ?", (date, time_id[0], set_id[0]))
       if cur.fetchone() != None:
-        # メニューを更新
-        # SQL文
+        # 登録済み
+        # [メニューを更新]
         SQL='''
         UPDATE menu
         SET food_id = ?,
@@ -569,15 +555,16 @@ def month():
         conn.commit()
         continue
       else:
+        # 未登録
         if old_date != date or old_time != time_id:
           # menu_idをインクリメント
           max_menu_id += 1
         cur.execute("INSERT INTO menu(menu_id, sets_id, date, times_id, food_id, minimum_number) VALUES(?, ?, date(?), ?, ?, ?)", (max_menu_id, set_id[0], date, time_id[0], food_id[0], minimum_number))
       conn.commit()
-      cur.close()
-      conn.close()
       old_date = date
       old_time = time_id
+    cur.close()
+    conn.close()
     return redirect(url_for('control_input'))
 
 # 寮食感想入力ページ
@@ -611,7 +598,7 @@ def bath():
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
 
-    # 入浴状況を取得
+    # [入浴状況を取得]
     SQL='''
     SELECT COUNT(*)
     FROM bath
@@ -623,7 +610,7 @@ def bath():
     bath_switch = cur.fetchone()
     print(f"bath_switch = {bath_switch}")
 
-    # 入浴状況ごとに集計
+    # [入浴状況ごとに集計]
     for condition in range(3):
       SQL='''
       SELECT COUNT(*)
@@ -635,7 +622,7 @@ def bath():
       people_list.append(cur.fetchone()[0])
     print(f"people_list = {people_list}")
 
-    # 母数を計算
+    # [母数を計算]
     SQL = '''
       SELECT COUNT(*)
       FROM (
@@ -710,10 +697,12 @@ def bath():
     response = make_response(render_template("./bath.html", bath_switch=bath_switch[0], people_list=people_list, today_list=today_list, average_list=average_list))
     return response
   else:
+    # POST
     bath_switch = request.form["bath_switch"]
-
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+
+    # [入浴中に変更]
     SQL='''
     UPDATE bath
     SET condition = 1,
@@ -724,9 +713,9 @@ def bath():
     print(f"time = {time}")
     cur.execute(SQL, (time, today, user_id))
     conn.commit()
+  
     cur.close()
     conn.close()
-    
     response = make_response(redirect(url_for('bath')))
     return response
 
@@ -741,8 +730,6 @@ def login():
     # POST
     user_name = request.form["user_name"]
     password = request.form["password"]
-
-    # SQL操作
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM user WHERE user_name == ?", (user_name, ))
@@ -795,7 +782,7 @@ def sinup():
       response = make_response(render_template("./sinup.html", condition=1))
       return response
     
-    # ユーザの追加
+    # [ユーザの追加]
     password_sh = password_hash(str(password))
     cur.execute("INSERT INTO user(user_name, password, permission) VALUES(?, ?, 1)", (user_name, password_sh))
     conn.commit()
@@ -817,13 +804,13 @@ def sinup():
     FROM user
     WHERE user_name = ?
     '''
-    cur.execute(SQL, (user_name))
+    cur.execute(SQL, (user_name, ))
     user_id = cur.fetchone()[0]
     print(f"menu_list = {menu_list}")
     print(f"user_id = {user_id}")
 
-    # [reservationにレコードを追加]
     for menu, set in menu_list:
+      # [reservationにレコードを追加]
       cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (menu, user_id, set))
       conn.commit()
     
@@ -840,6 +827,19 @@ def sinup():
     '''
     cur.execute(SQL, (today + (datetime.timedelta(days=2)), ))
     conn.commit()
+
+    # メンテナンス前か確認
+    SQL = '''
+    SELECT COUNT(*)
+    FROM log
+    WHERE date = date(?)
+    '''
+    cur.execute(SQL, (today, ))
+    log_f = cur.fetchone()
+    if log_f[0] == 0:
+      # [bathデータの追加]
+      cur.execute("INSERT INTO bath(date, user_id, condition, TTL) VALUES(date(?), ?, 0, ?)", (today, user_id, TTL))
+      conn.commit()
     
     cur.close()
     conn.close()
@@ -858,27 +858,24 @@ def change_password():
     user_name = request.form["user_name"]
     old_password = request.form["old_password"]
     new_password = request.form["new_password"]
-
-    # SQL操作
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
+
+    # [user表に存在するか]
     cur.execute("SELECT * FROM user WHERE user_name == ? AND password == ?", (user_name, password_hash(str(old_password))))
     fetch_user = cur.fetchone()
-    cur.close()
-    conn.close()
-
+    
     if fetch_user == None:
       # 入力ミス
       response = make_response(render_template("./change_password.html", condition=1))
+      cur.close()
+      conn.close()
       return response
     else:
-      # パスワードの変更
-      # SQL操作
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
+      # [パスワードの変更]
       cur.execute("UPDATE user SET password = ? WHERE user_name == ? AND password == ?", (password_hash(str(new_password)), user_name, password_hash(str(old_password))))
-      cur.close()
       conn.commit()
+      cur.close()
       conn.close()
       return redirect(url_for('index'))
 
@@ -903,18 +900,8 @@ def password_hash(password):
 def startup():
   now = datetime.datetime.now()
   today = datetime.date.today()
-
-  # SQL操作
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
-  SQL = '''
-  SELECT COUNT(*)
-  FROM log
-  WHERE date = date(?)
-  '''
-  cur.execute(SQL, (today, ))
-  log_f = cur.fetchone()
-  print(f"log = {log_f}")
 
   # TTLの更新
   for TTL_count in range(TTL):
@@ -937,14 +924,19 @@ def startup():
   '''
   cur.execute(SQL, (today, 0))
   conn.commit()
-  cur.close()
-  conn.close()
 
+  # [毎次バッチ処理済みか取得]
+  SQL = '''
+  SELECT COUNT(*)
+  FROM log
+  WHERE date = date(?)
+  '''
+  cur.execute(SQL, (today, ))
+  log_f = cur.fetchone()
+  print(f"log = {log_f}")
 
   # メンテナンス時間を3~4時
   if 3 <= now.hour < 4 and log_f[0] == 0:# その日の一回だけ実行
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
     cur.execute("INSERT INTO log(date) VALUES(date(?))", (today, ))
     conn.commit()
 
@@ -957,24 +949,14 @@ def startup():
     cur.execute(SQL)
     user_list = cur.fetchall()
 
-    cur.close()
-    conn.close()
-
     for user in user_list:
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
       # [bathデータの追加]
       cur.execute("INSERT INTO bath(date, user_id, condition, TTL) VALUES(date(?), ?, 0, ?)", (today, user[0], TTL))
       conn.commit()
-      cur.close()
-      conn.close()
 
     # 3週間先のデータの追加
     if today.weekday() == 0:
       # 月曜日の場合
-      conn = sqlite3.connect("./static/database/kakaria.db")
-      cur = conn.cursor()
-
       # [menu_idの取得]
       SQL = '''
       SELECT menu_id, MIN(sets_id)
@@ -984,27 +966,17 @@ def startup():
       '''
       cur.execute(SQL, (today, today + (datetime.timedelta(days=6))))
       menu_list = cur.fetchall()
-
-      cur.close()
-      conn.close()
       print(menu_list)
       print(user_list)
 
       for menu, set in menu_list:
         for user in user_list:
-          conn = sqlite3.connect("./static/database/kakaria.db")
-          cur = conn.cursor()
-          # [menu_idの取得]
+          # [予約表の追加]
           cur.execute("INSERT INTO reservation(menu_id, user_id, condition, answer) VALUES(?, ?, 0, ?)", (menu, user[0], set))
           conn.commit()
-          cur.close()
-          conn.close()
 
     # 未入力者の確定処理
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
-
-    # [menu_idの取得]
+    # [デフォルトのメニューで確定]
     SQL = '''
       UPDATE reservation
       SET condition = 1
@@ -1017,9 +989,9 @@ def startup():
     '''
     cur.execute(SQL, (today + (datetime.timedelta(days=UPDATE-1)), ))
     conn.commit()
-    cur.close()
-    conn.close()
-
+  
+  cur.close()
+  conn.close()
   return redirect(url_for('index'))
   
 # week数値を文字列に
@@ -1044,29 +1016,26 @@ def authentication_redirect():
 # セッションIDの生成
 def create_sessid(user_id):
   print("create_sessid()")
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+
+  # セッションIDの発行
   while True:
     sessid = str(user_id) + str(random.uniform(-100000, 100000)) + str(datetime.datetime.now())
     sessid = hashlib.sha256(sessid.encode()).hexdigest()
 
-    # SQL操作
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
     cur.execute("SELECT * FROM session WHERE session_id == ?", (sessid, ))
     fetch_session = cur.fetchone()
-    cur.close()
-    conn.close()
     if fetch_session == None:
       # 一意制約に違反していない
       break
   
-  # SQL操作 [セッションID追加]
-  conn = sqlite3.connect("./static/database/kakaria.db")
-  cur = conn.cursor()
+  # [セッションID追加]
   cur.execute("INSERT INTO session(session_id, user_id) VALUES(?, ?)", (str(sessid), user_id))
   conn.commit()
+  
   cur.close()
   conn.close()
-  
   print(f"\treturn {sessid=}")
   return sessid
 
@@ -1082,7 +1051,7 @@ def authentication_session():
   # cookieの取得
   cookie_sessid = request.cookies.get("SESSID")
 
-  # SQL操作[セッションIDの検索]
+  # [セッションIDの検索]
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
   cur.execute("SELECT user_id FROM session WHERE session_id == ?", (cookie_sessid, ))
@@ -1095,7 +1064,7 @@ def authentication_session():
     return (-1, -1)
   else:
     # セッション認証完了
-    # SQL操作[セッションIDの検索]
+    # [セッションIDの検索]
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
     cur.execute("SELECT permission FROM user WHERE user_id == ?", (int(fetch_session[0]), ))

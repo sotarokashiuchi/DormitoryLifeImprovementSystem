@@ -104,8 +104,8 @@
       <form action="/bath" method="post">
         <input type="submit" name="bath_switch" value="入浴します">
       </form>
+    {% else %}
+      <p>入浴中又は入浴済み</p>
+    {% endif %}
   </div>
-  {% else %}
-    <p>入浴中又は入浴済み</p>
-  {% endif %}
 {% endblock %}

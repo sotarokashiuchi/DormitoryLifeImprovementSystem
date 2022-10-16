@@ -30,7 +30,7 @@ cur.execute(
 )
 conn.commit()
 
-# 5.時間帯表
+# 3.時間帯表
 cur.execute(
   "CREATE TABLE times("
     "times_id INTEGER,"
@@ -40,7 +40,7 @@ cur.execute(
 )
 conn.commit()
 
-# times表
+# 4.times表
 cur.execute("INSERT INTO times(times_id, time_str) VALUES(0, '朝')")
 cur.execute("INSERT INTO times(times_id, time_str) VALUES(1, '昼')")
 cur.execute("INSERT INTO times(times_id, time_str) VALUES(2, '夜')")
@@ -57,14 +57,14 @@ cur.execute(
 )
 conn.commit()
 
-# sets表
+# 6.sets表
 cur.execute("INSERT INTO sets(sets_id, set_str) VALUES(0, 'A')")
 cur.execute("INSERT INTO sets(sets_id, set_str) VALUES(1, 'B')")
 cur.execute("INSERT INTO sets(sets_id, set_str) VALUES(2, 'C')")
 cur.execute("INSERT INTO sets(sets_id, set_str) VALUES(3, 'D')")
 conn.commit()
 
-# 3.メニュー表作成
+# 7.メニュー表作成
 cur.execute(
   "CREATE TABLE menu("
     "menu_id INTEGER,"
@@ -81,7 +81,7 @@ cur.execute(
 )
 conn.commit()
 
-# 4.予約表作成
+# 8.予約表作成
 # condition 0 = 未入力, 1 = 確定, 2 = 入力済み
 cur.execute(
   "CREATE TABLE reservation("
@@ -97,7 +97,7 @@ cur.execute(
 conn.commit()
 
 
-# 5.セッションID表
+# 9.セッションID表
 cur.execute(
   "CREATE TABLE session("
     "session_id STRING,"
@@ -108,7 +108,7 @@ cur.execute(
 )
 conn.commit()
 
-# 5.更新処理
+# 10.更新処理
 cur.execute(
   "CREATE TABLE log("
     "date DATE,"
@@ -117,7 +117,7 @@ cur.execute(
 )
 conn.commit()
 
-# 5.お風呂混雑状況
+# 11.お風呂混雑状況
 # condition 0 = 未入浴, 1 = 入浴中, 2 = 入浴済み
 cur.execute(
   "CREATE TABLE bath("
