@@ -98,6 +98,7 @@ header{
 @media screen and (max-width:520px){
   header{
     flex-direction: row;
+    align-items: center;
   }
   #logo{
     font-size: 40px;
@@ -108,9 +109,6 @@ header{
   #logo :active{
     opacity: 0.7 ;
     transition: .2s;
-  }
-  .topmenu{
-    align-items: center;
   }
   .topmenu1{
     display: flex;
@@ -154,8 +152,8 @@ header{
   .menu-btn{
     display: flex;
     position: relative; /*線の起点*/
-    width: 100px; /*ボタンの幅*/
-    height: 100px; /*ボタンの高さ*/
+    width: 68px; /*ボタンの幅*/
+    height: 68px; /*ボタンの高さ*/
     cursor: pointer; /*クリック可能を伝える*/
     z-index: 100; /*最前面*/
   }

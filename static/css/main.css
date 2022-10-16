@@ -114,10 +114,12 @@ header{
     display: flex;
     flex-direction: column;
     text-align: center;
-    padding: 0px;
+    margin: 16px 0px;
+    padding-left: 10px;
   }
   .topmenu1 li{
     margin: 3px;
+    width: 72px;
   }
   .topmenu1 li a{
     padding: 0px;
@@ -247,61 +249,11 @@ header{
   border: 1px solid #555; 
   max-width: 365px;
 }
-
-@media screen and ( max-width:960px){
-  .elementstyle {
-    background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247); 
-    font-family: sans-serif;
-    margin: 50px auto 60px auto;
-    color: rgb(39, 39, 40);
-    max-width: 450px;
-  } 
-}
- 
-@media screen and ( max-width:520px){
-  .elementstyle {
-    background-color: rgb(244, 245, 247);
-    border: 1px solid rgb(244, 245, 247); 
-    font-family: sans-serif;
-    margin: 50px auto 60px auto;
-    color: rgb(39, 39, 40);
-    max-width: 400px;
-  } 
-}
-
 input[type="text"] , input[type="password"]{
   width: 220px;
   height: 19px;
   font-size: 80%;     
-} 
-
-@media screen and ( max-width:960px){
-  input[type="text"] , input[type="password"]{
-    padding-top: 0px;
-    padding-bottom: 0px;   
-    height: 25px;
-    width: 280px;
-    font-size: 100%; 
- }
- .h1size{
-  font-size: 30px;
- }
 }
-
-@media screen and ( max-width:520px){
-  input[type="text"] , input[type="password"]{
-    padding-top: 0px;
-    padding-bottom: 0px;
-    height: 23px;
-    font-size: 100%;  
-    width: 220px;   
- }
- .h1size{
-  font-size: 27px;
- }
-}
-
 input[type="submit"] {
   /* padding-top: 3px;
   padding-bottom: 3px; */
@@ -317,19 +269,53 @@ input[type="submit"] {
   color: white;
   cursor: pointer;
   text-decoration: none; /* 文字の下線を消す */
-} 
-
-@media screen and ( max-width:960px){
-  input[type="submit"] , form input[type="reset"]{
-    height: 30px;
-    width: 264px;
-  }
 }
-
-@media screen and ( max-width:520px){
-  input[type="submit"] , form input[type="reset"]{
-    width: 225px;
+@media screen and ( max-width:960px){
+  .elementstyle {
+    background-color: rgb(244, 245, 247);
+    border: 1px solid rgb(244, 245, 247); 
+    font-family: sans-serif;
+    margin: 50px auto 60px auto;
+    color: rgb(39, 39, 40);
+    max-width: 450px;
   }
+  input[type="text"] , input[type="password"]{
+    padding-top: 0px;
+    padding-bottom: 0px;   
+    height: 25px;
+    width: 280px;
+    font-size: 100%; 
+ }
+ .h1size{
+  font-size: 30px;
+ }
+ input[type="submit"] , form input[type="reset"]{
+  height: 30px;
+  width: 264px;
+}
+}
+@media screen and ( max-width:520px){
+  .elementstyle {
+    background-color: rgb(244, 245, 247);
+    border: 1px solid rgb(244, 245, 247); 
+    font-family: sans-serif;
+    margin: 50px auto 60px auto;
+    color: rgb(39, 39, 40);
+    max-width: 400px;
+  }
+  input[type="text"] , input[type="password"]{
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 23px;
+    font-size: 100%;  
+    width: 220px;   
+ }
+ .h1size{
+  font-size: 27px;
+ }
+ input[type="submit"] , form input[type="reset"]{
+  width: 225px;
+}
 }
 .miss{
   color: red;
