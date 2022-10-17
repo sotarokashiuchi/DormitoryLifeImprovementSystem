@@ -129,10 +129,12 @@ def week():
       answer = cur.fetchone()
       
       # フォーマットに整える
+      year, month, day = menu[2].split('-')
+      print(year, month, day)
       if answer != None:
-        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], "checked"))
+        menu_answer_list.append((menu[0], menu[1], month, day, menu[3], menu[4], "checked"))
       else:
-        menu_answer_list.append((menu[0], menu[1], menu[2], menu[3], menu[4], ""))
+        menu_answer_list.append((menu[0], menu[1], month, day, menu[3], menu[4], ""))
       
     cur.close()
     conn.close()

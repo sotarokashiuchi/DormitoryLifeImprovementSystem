@@ -9,19 +9,19 @@
         <th colspan="2">メニュー</th>
       </tr>
       {% set ns = namespace(old_menu = 0) %}
-      {% for menu_id, set, date, time, food_name, checked in menu_answer_list %}
+      {% for menu_id, set, month, day, time, food_name, checked in menu_answer_list %}
         {% if loop.index == 1 %}  <!-- loop.indexは特殊な変数.ループの回数を保持 -->
           <!-- 新しい日付,新しい時間帯 -->
           <tr>
             <td>
-              <p>{{date}}({{time}})</p>
+              <p>{{month}}/{{day}}({{time}})</p>
             </td>
         {% elif ns.old_menu - menu_id != 0 %}  <!-- loop.indexは特殊な変数.ループの回数を保持 -->
           <!-- 新しい日付,新しい時間帯 -->
           </tr>
           <tr>
             <td>
-              <p>{{date}}({{time}})</p>
+              <p>{{month}}/{{day}}({{time}})</p>
             </td>
         {% endif %}
 
