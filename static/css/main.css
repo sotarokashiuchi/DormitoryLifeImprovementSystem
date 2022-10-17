@@ -108,7 +108,7 @@ header{
   }
   #logo{
     /* font-size: 40px; */
-    font-size: calc(40px + 40 * (100vw - 310px) / 210);
+    font-size: calc(40px + 40 * (100vw - 320px) / 200);
   }
   #logo :hover{
     opacity: 1.0 ;
