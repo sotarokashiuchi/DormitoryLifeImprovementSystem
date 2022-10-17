@@ -1,3 +1,8 @@
+/* Safari clamp関数対策 */
+*{
+  min-height: 0vw;
+}
+
 /* common */
 body{ 
   background-color:#F4F5F7;
