@@ -15,7 +15,6 @@ header{
   flex-direction: column;
   padding: 0.5rem;
   background-color:#F4F5F7;
-  justify-content: space-between;
 }
 .topmenu{
   display: flex;
@@ -100,9 +99,11 @@ header{
   header{
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   }
   #logo{
-    font-size: 40px;
+    /* font-size: 40px; */
+    font-size: calc(40px + 40 * (100vw - 320px) / 200);
   }
   #logo :hover{
     opacity: 1.0 ;
