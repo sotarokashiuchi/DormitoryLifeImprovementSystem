@@ -1,9 +1,6 @@
 import sqlite3
 import datetime
-# pairディレクトリに配置した場合
-# conn = sqlite3.connect("./../../static/database/TEST.db")
-# meet best friendから実行した場合
-# conn = sqlite3.connect(f"./static/database/{datetime.datetime.now().day}_{datetime.datetime.now().hour}_{datetime.datetime.now().minute}_{datetime.datetime.now().second}.db")
+
 conn = sqlite3.connect("./static/database/kakaria.db")
 cur = conn.cursor()
 

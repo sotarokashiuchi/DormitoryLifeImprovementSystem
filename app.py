@@ -36,9 +36,11 @@ def index():
     return authentication_redirect()
     
   user_id = authentication_session()[0]
-  today = datetime.date.today()
+  dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+  today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
+  today_list, average_list = graph()
   
   # [本日の予約済みメニューを取得]
   SQL='''
@@ -56,7 +58,7 @@ def index():
   print(f"orderlist = {order_list}")
   cur.close()
   conn.close()
-  response = make_response(render_template("./index.html", order_list=order_list, today=str(today)))
+  response = make_response(render_template("./index.html", order_list=order_list, today=str(today), today_list=today_list, average_list=average_list))
   return response
 
 # 寮食予約システム > トップ
@@ -82,7 +84,8 @@ def week():
   if key != '1' and key != '2':
     # week1,2以外にアクセス
     return redirect(url_for('ryosyoku_order'))
-  today = datetime.date.today()
+  dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+  today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
   monday = today - datetime.timedelta(days=today.weekday())
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
@@ -328,7 +331,8 @@ def control_result():
     return redirect(url_for('login'))
   # セッション認証完了
 
-  today = datetime.date.today()
+  dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+  today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
   
@@ -586,17 +590,17 @@ def bath():
     return authentication_redirect()
 
   user_id = authentication_session()[0]
-  today = datetime.date.today()
-  now = datetime.datetime.now()
+  dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+  today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
+  now = datetime.datetime(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day, hour=dt_jst.hour, minute=dt_jst.minute, second=dt_jst.second)
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+
   time = f"{now.hour:02}:{now.minute:02}:{now.second:02}"
 
   if request.method == "GET":
-    # 定義
     people_list = []
-    today_list = []
-    average_list = []
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
+    today_list, average_list = graph()
 
     # [入浴状況を取得]
     SQL='''
@@ -622,76 +626,6 @@ def bath():
       people_list.append(cur.fetchone()[0])
     print(f"people_list = {people_list}")
 
-    # [母数を計算]
-    SQL = '''
-      SELECT COUNT(*)
-      FROM (
-        SELECT DISTINCT date
-        FROM bath
-      )
-    '''
-    cur.execute(SQL)
-    all_date = cur.fetchone()[0]
-    print(all_date)
-
-    # グラフの作成
-    start_time = datetime.datetime(YEAR, 1, 1, 17, 0, 0, 0)
-    for _ in range(15):
-      # 集計時刻を取得
-      goal_time = start_time +  datetime.timedelta(minutes=19, seconds=59)
-      point_time = f"{start_time.hour:02}:{start_time.minute:02}:{start_time.second:02}"
-      point_stop_time = f"{goal_time.hour:02}:{goal_time.minute:02}:{goal_time.second:02}"
-      print(f"point_time = {point_time}, point_stop_time = {point_stop_time}")
-      
-      # 本日の推移
-      SQL='''
-      SELECT COUNT(*)
-      FROM bath
-      WHERE date = date(?)
-        AND condition <> 0
-        AND time BETWEEN time(?) AND time(?)
-      '''
-      cur.execute(SQL, (today, point_time, point_stop_time))
-      percent = ((cur.fetchone()[0]) / BATH_MAX * 100)
-      color = None
-      if percent < 80:
-        # 青
-        color = "rgb(26,115,232)"
-      elif 80 <= percent < 100:
-        # 黄
-        color = "rgb(255,209,0)"
-      elif 100 <= percent:
-        # 赤
-        color = "rgb(255,39,1)"
-        percent = 100
-      today_list.append((percent, color))
-      
-      # 平均の推移
-      SQL='''
-      SELECT COUNT(*)
-      FROM bath
-      WHERE condition <> 0
-        AND time BETWEEN time(?) AND time(?)
-      '''
-      cur.execute(SQL, (point_time, point_stop_time))
-      percent = (cur.fetchone()[0]) / all_date / BATH_MAX * 100
-      color = None
-      if percent < 80:
-        # 青
-        color = "rgb(26,115,232)"
-      elif 80 <= percent < 100:
-        # 黄
-        color = "rgb(255,209,0)"
-      elif 100 <= percent:
-        # 赤
-        color = "rgb(255,39,1)"
-        percent = 100
-      average_list.append((percent, color))
-
-      # 更新処理
-      start_time += datetime.timedelta(minutes=20)
-    print(f"today_list = {today_list}")
-
     cur.close()
     conn.close()
     response = make_response(render_template("./bath.html", bath_switch=bath_switch[0], people_list=people_list, today_list=today_list, average_list=average_list))
@@ -699,8 +633,6 @@ def bath():
   else:
     # POST
     bath_switch = request.form["bath_switch"]
-    conn = sqlite3.connect("./static/database/kakaria.db")
-    cur = conn.cursor()
 
     # [入浴中に変更]
     SQL='''
@@ -718,6 +650,89 @@ def bath():
     conn.close()
     response = make_response(redirect(url_for('bath')))
     return response
+
+def graph():
+  # 定義
+  today_list = []
+  average_list = []
+  dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+  today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
+  conn = sqlite3.connect("./static/database/kakaria.db")
+  cur = conn.cursor()
+
+  # [母数を計算]
+  SQL = '''
+    SELECT COUNT(*)
+    FROM (
+      SELECT DISTINCT date
+      FROM bath
+    )
+  '''
+  cur.execute(SQL)
+  all_date = cur.fetchone()[0]
+  print(all_date)
+
+  # グラフの作成
+  start_time = datetime.datetime(YEAR, 1, 1, 17, 0, 0, 0)
+  for _ in range(15):
+    # 集計時刻を取得
+    goal_time = start_time +  datetime.timedelta(minutes=19, seconds=59)
+    point_time = f"{start_time.hour:02}:{start_time.minute:02}:{start_time.second:02}"
+    point_stop_time = f"{goal_time.hour:02}:{goal_time.minute:02}:{goal_time.second:02}"
+    print(f"point_time = {point_time}, point_stop_time = {point_stop_time}")
+    
+    # 本日の推移
+    SQL='''
+    SELECT COUNT(*)
+    FROM bath
+    WHERE date = date(?)
+      AND condition <> 0
+      AND time BETWEEN time(?) AND time(?)
+    '''
+    cur.execute(SQL, (today, point_time, point_stop_time))
+    percent = ((cur.fetchone()[0]) / BATH_MAX * 100)
+    color = None
+    if percent < 80:
+      # 青
+      color = "rgb(26,115,232)"
+    elif 80 <= percent < 100:
+      # 黄
+      color = "rgb(255,209,0)"
+    elif 100 <= percent:
+      # 赤
+      color = "rgb(255,39,1)"
+      percent = 100
+    today_list.append((percent, color))
+    
+    # 平均の推移
+    SQL='''
+    SELECT COUNT(*)
+    FROM bath
+    WHERE condition <> 0
+      AND time BETWEEN time(?) AND time(?)
+    '''
+    cur.execute(SQL, (point_time, point_stop_time))
+    percent = (cur.fetchone()[0]) / all_date / BATH_MAX * 100
+    print(f"percent = {percent}")
+    color = None
+    if percent < 80:
+      # 青
+      color = "rgb(26,115,232)"
+    elif 80 <= percent < 100:
+      # 黄
+      color = "rgb(255,209,0)"
+    elif 100 <= percent:
+      # 赤
+      color = "rgb(255,39,1)"
+      percent = 100
+    average_list.append((percent, color))
+
+    # 更新処理
+    start_time += datetime.timedelta(minutes=20)
+  print(f"today_list = {today_list}")
+  cur.close()
+  conn.close()
+  return [today_list, average_list]
 
 # ログインページ
 @app.route('/login', methods=["POST", "GET"])
@@ -770,7 +785,9 @@ def sinup():
     # POST
     user_name = request.form["user_name"]
     password = request.form["password"]
-    today = datetime.date.today()
+    dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+    today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
+  
     conn = sqlite3.connect("./static/database/kakaria.db")
     cur = conn.cursor()
 
@@ -898,8 +915,9 @@ def password_hash(password):
 # @app.route('/startup', methods=["HEAD"])
 @app.route('/startup')
 def startup():
-  now = datetime.datetime.now()
-  today = datetime.date.today()
+  dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+  today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
+  now = datetime.datetime(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day, hour=dt_jst.hour, minute=dt_jst.minute, second=dt_jst.second)
   conn = sqlite3.connect("./static/database/kakaria.db")
   cur = conn.cursor()
 

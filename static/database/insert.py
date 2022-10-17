@@ -1,9 +1,6 @@
 import sqlite3
 import datetime
-# pairディレクトリに配置した場合
-# conn = sqlite3.connect('./../../static/database/TEST.db')
-# meet best friendから実行した場合
-# conn = sqlite3.connect(f'./static/database/{datetime.datetime.now().day}_{datetime.datetime.now().hour}_{datetime.datetime.now().minute}_{datetime.datetime.now().second}.db')
+
 conn = sqlite3.connect('./static/database/kakaria.db')
 cur = conn.cursor()
 
@@ -12,6 +9,7 @@ cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test1', '
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test2', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test3', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test4', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
+cur.execute("INSERT INTO user(user_name, password, permission) VALUES('test5', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 1)")
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('admin', 'ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb', 2)")
 cur.execute("INSERT INTO user(user_name, password, permission) VALUES('adminguest', '5587de00d7d30fcd456048242c1b6d35276a2a7906f912519e396e46d61ddabf', 2)")
 conn.commit()
@@ -365,9 +363,8 @@ cur.close()
 conn.close()
 
 
-today = datetime.date.today()
-  # メンテナンス時間を3~4時
-  # if 3 <= now.hour < 4 and 1 == 1:# その日の一回だけ実行
+dt_jst = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+today = datetime.date(year=dt_jst.year, month=dt_jst.month, day=dt_jst.day)
 if True:
   # 3週間先のデータの追加
   if True:
