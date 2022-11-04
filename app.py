@@ -11,8 +11,9 @@ import datetime
 YEAR = 2022
 # 寮食予約システム 予約受付終了時間(日)
 UPDATE = 3
-# お風呂の入浴時間(分)
-BATH_MAX = 20
+# お風呂の混雑度
+# BATH_MAX = 20
+BATH_MAX = 10
 TTL = 5
 
 # flaskクラスのインスタンスを作成
